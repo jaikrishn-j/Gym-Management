@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { ClerkProvider } from "@clerk/nextjs";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import AppToaster from "./components/shared/Toaster";
 
 
@@ -33,6 +34,7 @@ export default function RootLayout({
         suppressHydrationWarning
       >
         <body className="flex flex-col">
+          <SpeedInsights />
           <AppToaster />
           <div className="min-h-screen flex-1 w-full">
             {children}

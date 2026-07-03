@@ -2,6 +2,8 @@
 
 A comprehensive gym management platform built with Next.js 16, featuring three role-based portals for admins, staff, and members. Manage memberships, track attendance, process payments, handle equipment inventory, and broadcast announcements — all from a single platform.
 
+**Production preview:** [https://gym-management-preview.vercel.app](https://gym-management-preview.vercel.app)
+
 ## Tech Stack
 
 | Layer | Technology |

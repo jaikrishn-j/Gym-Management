@@ -12,6 +12,7 @@
     "@clerk/nextjs": "^7.5.11",
     "@clerk/types": "^4.101.25",
     "@heroui/react": "^3.2.1",
+    "@vercel/speed-insights": "^2.0.0",
     "dotenv": "^17.4.2",
     "drizzle-orm": "^1.0.0-rc.4",
     "framer-motion": "^12.42.2",
