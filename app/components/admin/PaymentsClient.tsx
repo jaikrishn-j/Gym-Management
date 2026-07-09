@@ -8,6 +8,7 @@ import {
   Banknote, CheckCircle2, Clock, ArrowUpRight, Hash, FileText, UserCircle,
   QrCode, Receipt, SlidersHorizontal, ChevronDown, Download
 } from 'lucide-react'
+
 import type { EnrichedPayment, PaymentStats, PaymentsResponse } from '@/app/admin/payments/action'
 
 interface PaymentsClientProps {
@@ -147,53 +148,145 @@ export default function PaymentsClient({
 
   return (
     <div className="max-w-7xl mx-auto space-y-6 px-4 py-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-green-500/10">
-            <Wallet className="h-6 w-6 text-green-500" />
-          </div>
-          <div>
-            <h1 className="text-2xl font-black text-[var(--foreground)]">Payments</h1>
-            <p className="text-sm text-[var(--muted)]">Transaction history & revenue overview</p>
+      {/* Hero Header */}
+      <motion.div
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ type: 'spring', stiffness: 200, damping: 20 }}
+        className="bg-gradient-to-r from-green-500/10 via-green-500/5 to-transparent rounded-2xl border border-[var(--border)] p-6"
+      >
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-green-500/20 to-green-500/5 text-green-500 shadow-lg shadow-green-500/10">
+              <Wallet className="h-7 w-7" />
+            </div>
+            <div>
+              <h1 className="text-2xl font-black text-[var(--foreground)]">Payments</h1>
+              <p className="text-sm text-[var(--muted)]">Transaction history &amp; revenue overview</p>
+            </div>
           </div>
         </div>
-      </div>
+
+        {/* Stat Pills */}
+        <div className="flex items-center gap-4 mt-4 pt-4 border-t border-[var(--border)]/50">
+          <div className="flex items-center gap-2">
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-green-500/10">
+              <IndianRupee className="h-4 w-4 text-green-500" />
+            </div>
+            <div>
+              <p className="text-[10px] text-[var(--muted)] font-semibold uppercase">Total Revenue</p>
+              <p className="text-sm font-bold text-[var(--foreground)]">{stats ? formatCurrency(stats.totalRevenue) : '—'}</p>
+            </div>
+          </div>
+          <div className="w-px h-8 bg-[var(--border)]" />
+          <div className="flex items-center gap-2">
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-500/10">
+              <TrendingUp className="h-4 w-4 text-blue-500" />
+            </div>
+            <div>
+              <p className="text-[10px] text-[var(--muted)] font-semibold uppercase">This Month</p>
+              <p className="text-sm font-bold text-green-500">{stats ? formatCurrency(stats.thisMonthRevenue) : '—'}</p>
+            </div>
+          </div>
+          <div className="w-px h-8 bg-[var(--border)]" />
+          <div className="flex items-center gap-2">
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-purple-500/10">
+              <Receipt className="h-4 w-4 text-purple-500" />
+            </div>
+            <div>
+              <p className="text-[10px] text-[var(--muted)] font-semibold uppercase">Transactions</p>
+              <p className="text-sm font-bold text-[var(--foreground)]">{stats ? stats.totalPayments : '—'}</p>
+            </div>
+          </div>
+          <div className="w-px h-8 bg-[var(--border)]" />
+          <div className="flex items-center gap-2">
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-orange-500/10">
+              <Banknote className="h-4 w-4 text-orange-500" />
+            </div>
+            <div>
+              <p className="text-[10px] text-[var(--muted)] font-semibold uppercase">This Month</p>
+              <p className="text-sm font-bold text-[var(--foreground)]">{stats ? stats.thisMonthPayments : '—'}</p>
+            </div>
+          </div>
+        </div>
+      </motion.div>
 
       {error && (
-        <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}
-          className="flex items-center gap-3 rounded-2xl bg-red-500/10 border border-red-500/20 p-4">
-          <AlertCircle className="h-5 w-5 text-red-500 shrink-0" />
-          <p className="text-sm text-red-500 font-medium">{error}</p>
-          <button onClick={() => setError('')} className="ml-auto"><X className="h-4 w-4 text-red-500" /></button>
+        <motion.div
+          initial={{ opacity: 0, y: -20, scale: 0.98 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          transition={{ type: 'spring', stiffness: 200, damping: 20 }}
+          className="flex items-center gap-3 rounded-2xl bg-[var(--danger)]/10 border border-[var(--danger)]/20 p-4"
+        >
+          <AlertCircle className="h-5 w-5 text-[var(--danger)] shrink-0" />
+          <p className="text-sm text-[var(--danger)] font-medium">{error}</p>
+          <motion.button
+            onClick={() => setError('')}
+            whileHover={{ rotate: 90, scale: 1.1 }}
+            className="ml-auto h-8 w-8 flex items-center justify-center rounded-lg hover:bg-[var(--danger)]/10 transition-colors"
+          >
+            <X className="h-4 w-4 text-[var(--danger)]" />
+          </motion.button>
         </motion.div>
       )}
 
-      {/* Stats Cards */}
+      {/* Stats Cards — Glassmorphism + Staggered Spring */}
       {stats && (
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          <motion.div whileHover={{ scale: 1.02 }}
-            className="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-5">
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ staggerChildren: 0.08 }}
+          className="grid grid-cols-2 lg:grid-cols-4 gap-4"
+        >
+          {/* Total Revenue */}
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ type: 'spring', stiffness: 200, damping: 20 }}
+            whileHover={{ y: -4, boxShadow: '0 20px 60px rgba(0,0,0,0.1)' }}
+            className="rounded-2xl backdrop-blur-xl bg-[var(--surface)]/80 border border-[var(--border)]/50 p-5"
+          >
             <div className="flex items-center gap-2 text-[var(--muted)] text-xs font-semibold uppercase mb-2">
-              <IndianRupee className="h-4 w-4" /> Total Revenue
+              <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-green-500/10">
+                <IndianRupee className="h-3.5 w-3.5 text-green-500" />
+              </div>
+              Total Revenue
             </div>
             <p className="text-2xl font-black text-[var(--foreground)]">{formatCurrency(stats.totalRevenue)}</p>
             <p className="text-xs text-[var(--muted)] mt-1">{stats.totalPayments} transactions</p>
           </motion.div>
 
-          <motion.div whileHover={{ scale: 1.02 }}
-            className="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-5">
+          {/* This Month */}
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ type: 'spring', stiffness: 200, damping: 20 }}
+            whileHover={{ y: -4, boxShadow: '0 20px 60px rgba(0,0,0,0.1)' }}
+            className="rounded-2xl backdrop-blur-xl bg-[var(--surface)]/80 border border-[var(--border)]/50 p-5"
+          >
             <div className="flex items-center gap-2 text-[var(--muted)] text-xs font-semibold uppercase mb-2">
-              <TrendingUp className="h-4 w-4" /> This Month
+              <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-blue-500/10">
+                <TrendingUp className="h-3.5 w-3.5 text-blue-500" />
+              </div>
+              This Month
             </div>
             <p className="text-2xl font-black text-green-500">{formatCurrency(stats.thisMonthRevenue)}</p>
             <p className="text-xs text-[var(--muted)] mt-1">{stats.thisMonthPayments} payments</p>
           </motion.div>
 
-          <motion.div whileHover={{ scale: 1.02 }}
-            className="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-5">
+          {/* Top Method */}
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ type: 'spring', stiffness: 200, damping: 20 }}
+            whileHover={{ y: -4, boxShadow: '0 20px 60px rgba(0,0,0,0.1)' }}
+            className="rounded-2xl backdrop-blur-xl bg-[var(--surface)]/80 border border-[var(--border)]/50 p-5"
+          >
             <div className="flex items-center gap-2 text-[var(--muted)] text-xs font-semibold uppercase mb-2">
-              <CreditCard className="h-4 w-4" /> Top Method
+              <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-purple-500/10">
+                <CreditCard className="h-3.5 w-3.5 text-purple-500" />
+              </div>
+              Top Method
             </div>
             <p className="text-2xl font-black text-[var(--foreground)]">
               {Object.entries(stats.methodBreakdown).sort((a, b) => b[1] - a[1])[0]?.[0] ?? 'N/A'}
@@ -203,25 +296,48 @@ export default function PaymentsClient({
             </p>
           </motion.div>
 
-          <motion.div whileHover={{ scale: 1.02 }}
-            className="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-5">
-            <div className="flex items-center gap-2 text-[var(--muted)] text-xs font-semibold uppercase mb-2">
-              <Wallet className="h-4 w-4" /> Source Split
+          {/* Source Split */}
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ type: 'spring', stiffness: 200, damping: 20 }}
+            whileHover={{ y: -4, boxShadow: '0 20px 60px rgba(0,0,0,0.1)' }}
+            className="rounded-2xl backdrop-blur-xl bg-[var(--surface)]/80 border border-[var(--border)]/50 p-5"
+          >
+            <div className="flex items-center gap-2 text-[var(--muted)] text-xs font-semibold uppercase mb-3">
+              <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-orange-500/10">
+                <Wallet className="h-3.5 w-3.5 text-orange-500" />
+              </div>
+              Source Split
             </div>
-            <div className="space-y-1.5">
-              {Object.entries(stats.sourceBreakdown).map(([source, amount]) => (
-                <div key={source} className="flex items-center justify-between">
-                  <span className="text-xs text-[var(--muted)] capitalize">{source}</span>
-                  <span className="text-xs font-semibold">{formatCurrency(amount)}</span>
-                </div>
-              ))}
+            <div className="space-y-2">
+              {Object.entries(stats.sourceBreakdown).map(([source, amount], idx) => {
+                const totalSource = Object.values(stats.sourceBreakdown).reduce((a, b) => a + b, 0)
+                const pct = totalSource > 0 ? (amount / totalSource) * 100 : 0
+                return (
+                  <div key={source}>
+                    <div className="flex items-center justify-between mb-0.5">
+                      <span className="text-xs text-[var(--muted)] capitalize">{source}</span>
+                      <span className="text-xs font-semibold text-[var(--foreground)]">{formatCurrency(amount)}</span>
+                    </div>
+                    <div className="h-1.5 w-full rounded-full bg-[var(--surface-secondary)] overflow-hidden">
+                      <motion.div
+                        initial={{ width: 0 }}
+                        animate={{ width: `${pct}%` }}
+                        transition={{ delay: 0.3 + idx * 0.1, duration: 0.6, ease: 'easeOut' }}
+                        className="h-full rounded-full bg-gradient-to-r from-[var(--accent)] to-green-400"
+                      />
+                    </div>
+                  </div>
+                )
+              })}
             </div>
           </motion.div>
-        </div>
+        </motion.div>
       )}
 
-      {/* Search & Filters */}
-      <div className="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-4 space-y-4">
+      {/* Search & Filters — Glassmorphism */}
+      <div className="rounded-2xl backdrop-blur-xl bg-[var(--surface)]/80 border border-[var(--border)]/50 p-4 space-y-4">
         <div className="flex items-center gap-3">
           <div className="relative flex-1">
             <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--muted)]" />
@@ -230,20 +346,20 @@ export default function PaymentsClient({
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               placeholder="Search by member name or email..."
-              className="w-full h-11 pl-10 pr-4 rounded-xl border border-[var(--field-border)] bg-[var(--field-background)] text-[var(--foreground)] text-sm placeholder:text-[var(--muted)] font-medium outline-none focus:border-green-500 focus:ring-4 focus:ring-green-500/15 transition-all"
+              className="w-full h-11 pl-10 pr-4 rounded-xl border border-[var(--field-border)] bg-[var(--field-background)] text-[var(--foreground)] text-sm placeholder:text-[var(--muted)] font-medium outline-none focus:border-[var(--accent)] focus:ring-4 focus:ring-[var(--accent)]/15 transition-all"
             />
           </div>
           <button
             onClick={() => setShowFilters(!showFilters)}
             className={`h-11 px-4 rounded-xl border text-sm font-semibold flex items-center gap-2 transition-all ${
               showFilters || filterMethod || filterSource
-                ? 'border-green-500 bg-green-500/10 text-green-500'
+                ? 'border-[var(--accent)] bg-[var(--accent)]/10 text-[var(--accent)]'
                 : 'border-[var(--field-border)] bg-[var(--field-background)] text-[var(--muted)] hover:text-[var(--foreground)]'
             }`}
           >
             <SlidersHorizontal className="h-4 w-4" /> Filters
             {(filterMethod || filterSource) && (
-              <span className="flex h-5 w-5 items-center justify-center rounded-full bg-green-500 text-white text-[10px] font-bold">
+              <span className="flex h-5 w-5 items-center justify-center rounded-full bg-[var(--accent)] text-white text-[10px] font-bold">
                 {(filterMethod ? 1 : 0) + (filterSource ? 1 : 0)}
               </span>
             )}
@@ -260,12 +376,12 @@ export default function PaymentsClient({
                   <div className="flex flex-wrap gap-1.5">
                     <button onClick={() => setFilterMethod('')}
                       className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
-                        !filterMethod ? 'bg-green-500 text-white' : 'bg-[var(--field-background)] text-[var(--muted)] hover:text-[var(--foreground)]'
+                        !filterMethod ? 'bg-[var(--accent)] text-white shadow-md shadow-[var(--accent)]/20' : 'bg-[var(--field-background)] text-[var(--muted)] hover:text-[var(--foreground)]'
                       }`}>All</button>
                     {paymentMethods.map((m) => (
                       <button key={m} onClick={() => setFilterMethod(m === filterMethod ? '' : m)}
                         className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all capitalize ${
-                          filterMethod === m ? 'bg-green-500 text-white' : 'bg-[var(--field-background)] text-[var(--muted)] hover:text-[var(--foreground)]'
+                          filterMethod === m ? 'bg-[var(--accent)] text-white shadow-md shadow-[var(--accent)]/20' : 'bg-[var(--field-background)] text-[var(--muted)] hover:text-[var(--foreground)]'
                         }`}>{m.replace(/_/g, ' ')}</button>
                     ))}
                   </div>
@@ -275,12 +391,12 @@ export default function PaymentsClient({
                   <div className="flex flex-wrap gap-1.5">
                     <button onClick={() => setFilterSource('')}
                       className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
-                        !filterSource ? 'bg-green-500 text-white' : 'bg-[var(--field-background)] text-[var(--muted)] hover:text-[var(--foreground)]'
+                        !filterSource ? 'bg-[var(--accent)] text-white shadow-md shadow-[var(--accent)]/20' : 'bg-[var(--field-background)] text-[var(--muted)] hover:text-[var(--foreground)]'
                       }`}>All</button>
                     {paymentSources.map((s) => (
                       <button key={s} onClick={() => setFilterSource(s === filterSource ? '' : s)}
                         className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all capitalize ${
-                          filterSource === s ? 'bg-green-500 text-white' : 'bg-[var(--field-background)] text-[var(--muted)] hover:text-[var(--foreground)]'
+                          filterSource === s ? 'bg-[var(--accent)] text-white shadow-md shadow-[var(--accent)]/20' : 'bg-[var(--field-background)] text-[var(--muted)] hover:text-[var(--foreground)]'
                         }`}>{s}</button>
                     ))}
                   </div>
@@ -291,23 +407,42 @@ export default function PaymentsClient({
         </AnimatePresence>
       </div>
 
-      {/* Table */}
-      <div className="rounded-2xl border border-[var(--border)] bg-[var(--surface)] overflow-hidden">
+      {/* Table — Glassmorphism */}
+      <div className="rounded-2xl backdrop-blur-xl bg-[var(--surface)]/80 border border-[var(--border)]/50 overflow-hidden">
         {loading ? (
-          <div className="flex items-center justify-center py-20">
-            <Loader2 className="h-6 w-6 animate-spin text-green-500" />
+          <div className="flex flex-col items-center justify-center py-20">
+            <motion.div
+              animate={{ rotate: 360 }}
+              transition={{ repeat: Infinity, duration: 1.5, ease: 'linear' }}
+              className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[var(--surface-secondary)]"
+            >
+              <Loader2 className="h-6 w-6 text-[var(--accent)]" />
+            </motion.div>
+            <p className="text-xs text-[var(--muted)] mt-3">Loading payments...</p>
           </div>
         ) : payments.length === 0 ? (
-          <div className="text-center py-16">
-            <Receipt className="h-12 w-12 text-[var(--muted)] mx-auto mb-3 opacity-30" />
-            <p className="text-sm font-medium text-[var(--foreground)]">No payments found</p>
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ type: 'spring', stiffness: 200, damping: 20 }}
+            className="text-center py-16"
+          >
+            <motion.div
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              transition={{ delay: 0.1, type: 'spring', stiffness: 300, damping: 15 }}
+              className="flex h-16 w-16 items-center justify-center rounded-3xl bg-[var(--surface-secondary)] mx-auto mb-4"
+            >
+              <Receipt className="h-8 w-8 text-[var(--muted)]" />
+            </motion.div>
+            <p className="text-sm font-semibold text-[var(--foreground)]">No payments found</p>
             <p className="text-xs text-[var(--muted)] mt-1">Try adjusting your search or filters</p>
-          </div>
+          </motion.div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
-                <tr className="border-b border-[var(--border)] bg-[var(--surface-secondary)]">
+                <tr className="border-b border-[var(--border)]/50 bg-[var(--surface-secondary)]/50">
                   <th className="px-4 py-3.5 text-left text-[10px] font-semibold text-[var(--muted)] uppercase tracking-wider">Date</th>
                   <th className="px-4 py-3.5 text-left text-[10px] font-semibold text-[var(--muted)] uppercase tracking-wider">Member</th>
                   <th className="px-4 py-3.5 text-right text-[10px] font-semibold text-[var(--muted)] uppercase tracking-wider">Amount</th>
@@ -318,15 +453,16 @@ export default function PaymentsClient({
                   <th className="px-4 py-3.5 text-right text-[10px] font-semibold text-[var(--muted)] uppercase tracking-wider">Days</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-[var(--border)]">
+              <tbody className="divide-y divide-[var(--border)]/30">
                 {payments.map((payment, index) => (
                   <motion.tr
                     key={payment.id}
-                    initial={{ opacity: 0, y: 4 }}
+                    initial={{ opacity: 0, y: 8 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: index * 0.02 }}
+                    transition={{ delay: index * 0.025, type: 'spring', stiffness: 150, damping: 20 }}
+                    whileHover={{ backgroundColor: 'rgba(var(--accent), 0.03)' }}
                     onClick={() => setSelectedPayment(payment)}
-                    className="hover:bg-[var(--surface-secondary)]/50 transition-colors cursor-pointer"
+                    className="cursor-pointer transition-colors"
                   >
                     <td className="px-3 py-3 whitespace-nowrap">
                       <span className="text-sm text-[var(--foreground)]">{formatDate(payment.paymentDate)}</span>
@@ -334,10 +470,10 @@ export default function PaymentsClient({
                     <td className="px-3 py-3">
                       <div className="flex items-center gap-2">
                         {payment.memberImageUrl ? (
-                          <img src={payment.memberImageUrl} alt="" className="h-6 w-6 rounded-lg object-cover border border-[var(--border)] shrink-0" />
+                          <img src={payment.memberImageUrl} alt="" className="h-7 w-7 rounded-xl object-cover border border-[var(--border)] shrink-0" />
                         ) : (
-                          <div className="flex h-6 w-6 items-center justify-center rounded-lg bg-green-500/10 text-green-500 shrink-0">
-                            <User className="h-3 w-3" />
+                          <div className="flex h-7 w-7 items-center justify-center rounded-xl bg-[var(--accent)]/10 text-[var(--accent)] shrink-0">
+                            <User className="h-3.5 w-3.5" />
                           </div>
                         )}
                         <span className="text-sm font-semibold text-[var(--foreground)] truncate max-w-[160px]">{payment.memberName}</span>
@@ -362,14 +498,14 @@ export default function PaymentsClient({
           </div>
         )}
 
-        {/* Pagination */}
-        <div className="flex items-center justify-between px-4 py-3 border-t border-[var(--border)] bg-[var(--surface-secondary)]/50">
+        {/* Pagination — Glassmorphism */}
+        <div className="flex items-center justify-between px-4 py-3 border-t border-[var(--border)]/50 backdrop-blur-xl bg-[var(--surface)]/60">
           <div className="flex items-center gap-2">
             <span className="text-xs text-[var(--muted)]">Rows per page:</span>
             <select
               value={pageSize}
               onChange={(e) => { setPageSize(Number(e.target.value)); setPage(1); }}
-              className="h-8 px-2 rounded-lg border border-[var(--field-border)] bg-[var(--field-background)] text-xs font-medium text-[var(--foreground)] outline-none focus:border-green-500"
+              className="h-8 px-2 rounded-lg border border-[var(--field-border)] bg-[var(--field-background)] text-xs font-medium text-[var(--foreground)] outline-none focus:border-[var(--accent)] focus:ring-2 focus:ring-[var(--accent)]/10 transition-all"
             >
               {PAGE_SIZES.map(s => <option key={s} value={s}>{s}</option>)}
             </select>
@@ -378,82 +514,115 @@ export default function PaymentsClient({
             </span>
           </div>
           <div className="flex items-center gap-1">
-            <button
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
               onClick={() => setPage(p => Math.max(1, p - 1))}
               disabled={page <= 1}
               className="h-8 w-8 flex items-center justify-center rounded-lg hover:bg-[var(--surface-secondary)] disabled:opacity-30 transition-colors"
             >
               <ChevronLeft className="h-4 w-4" />
-            </button>
+            </motion.button>
             {Array.from({ length: Math.min(totalPages, 5) }, (_, i) => {
               const startPage = Math.max(1, Math.min(page - 2, totalPages - 4))
               const p = startPage + i
               if (p > totalPages) return null
               return (
-                <button key={p} onClick={() => setPage(p)}
+                <motion.button
+                  key={p}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => setPage(p)}
                   className={`h-8 w-8 rounded-lg text-xs font-semibold transition-all ${
-                    p === page ? 'bg-green-500 text-white' : 'hover:bg-[var(--surface-secondary)] text-[var(--muted)]'
-                  }`}>{p}</button>
+                    p === page ? 'bg-[var(--accent)] text-white shadow-md shadow-[var(--accent)]/20' : 'hover:bg-[var(--surface-secondary)] text-[var(--muted)]'
+                  }`}
+                >{p}</motion.button>
               )
             })}
-            <button
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
               onClick={() => setPage(p => Math.min(totalPages, p + 1))}
               disabled={page >= totalPages}
               className="h-8 w-8 flex items-center justify-center rounded-lg hover:bg-[var(--surface-secondary)] disabled:opacity-30 transition-colors"
             >
               <ChevronRight className="h-4 w-4" />
-            </button>
+            </motion.button>
           </div>
         </div>
       </div>
 
-      {/* Transaction Detail Modal */}
+      {/* Transaction Detail Modal — Glassmorphism + Decorative Accent */}
       <AnimatePresence>
         {selectedPayment && (
           <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4">
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
               onClick={() => setSelectedPayment(null)}
-              className="absolute inset-0 bg-black/50 backdrop-blur-sm" />
-            <motion.div initial={{ opacity: 0, y: 100 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 100 }}
+              className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/50 to-black/60 backdrop-blur-md"
+            />
+            <motion.div
+              initial={{ opacity: 0, y: 100 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 100 }}
               transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-              className="relative w-full sm:max-w-lg max-h-[90vh] overflow-y-auto rounded-t-3xl sm:rounded-3xl border border-[var(--border)] bg-[var(--surface)] shadow-2xl z-10">
-              
+              className="relative w-full sm:max-w-lg max-h-[90vh] overflow-y-auto rounded-t-3xl sm:rounded-3xl border border-[var(--border)]/50 bg-[var(--surface)]/95 backdrop-blur-xl shadow-2xl z-10"
+            >
+              {/* Decorative Accent Bar */}
+              <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[var(--accent)] via-[var(--accent)]/50 to-transparent rounded-t-3xl" />
+
               {/* Modal Header */}
-              <div className="sticky top-0 bg-[var(--surface)] border-b border-[var(--border)] px-6 py-4 flex items-center justify-between z-10 rounded-t-3xl">
+              <div className="sticky top-0 bg-[var(--surface)]/95 backdrop-blur-xl border-b border-[var(--border)]/50 px-6 py-4 flex items-center justify-between z-10 rounded-t-3xl">
                 <div className="flex items-center gap-3">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-green-500/10">
-                    <Receipt className="h-5 w-5 text-green-500" />
+                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[var(--accent)]/10">
+                    <Receipt className="h-5 w-5 text-[var(--accent)]" />
                   </div>
                   <div>
                     <h2 className="text-lg font-bold text-[var(--foreground)]">Transaction Details</h2>
                     <p className="text-[10px] text-[var(--muted)] font-mono">{selectedPayment.id.slice(0, 12)}...</p>
                   </div>
                 </div>
-                <button onClick={() => setSelectedPayment(null)}
-                  className="h-8 w-8 flex items-center justify-center rounded-lg hover:bg-[var(--surface-secondary)] transition-colors">
+                <motion.button
+                  whileHover={{ scale: 1.1, rotate: 90 }}
+                  whileTap={{ scale: 0.9 }}
+                  onClick={() => setSelectedPayment(null)}
+                  className="h-8 w-8 flex items-center justify-center rounded-lg hover:bg-[var(--surface-secondary)] transition-colors"
+                >
                   <X className="h-5 w-5 text-[var(--muted)]" />
-                </button>
+                </motion.button>
               </div>
 
               <div className="px-6 py-5 space-y-6">
                 {/* Amount */}
-                <div className="text-center py-4">
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.05, type: 'spring', stiffness: 200, damping: 20 }}
+                  className="text-center py-4"
+                >
                   <p className="text-[10px] text-[var(--muted)] font-semibold uppercase mb-1">Amount</p>
                   <p className="text-4xl font-black text-[var(--foreground)]">{formatCurrency(selectedPayment.amount)}</p>
                   <div className="flex items-center justify-center gap-2 mt-2">
                     {getStatusBadge(selectedPayment.status)}
                     {getSourceBadge(selectedPayment.paymentSource)}
                   </div>
-                </div>
+                </motion.div>
 
                 {/* Member Info */}
-                <div className="rounded-2xl border border-[var(--border)] bg-[var(--field-background)]/50 p-4">
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.1, type: 'spring', stiffness: 200, damping: 20 }}
+                  className="rounded-2xl border border-[var(--border)]/50 bg-[var(--field-background)]/50 backdrop-blur-sm p-4"
+                >
                   <div className="flex items-center gap-3">
                     {selectedPayment.memberImageUrl ? (
                       <img src={selectedPayment.memberImageUrl} alt="" className="h-12 w-12 rounded-xl object-cover border border-[var(--border)]" />
                     ) : (
-                      <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-green-500/10">
-                        <UserCircle className="h-6 w-6 text-green-500" />
+                      <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-[var(--accent)]/10">
+                        <UserCircle className="h-6 w-6 text-[var(--accent)]" />
                       </div>
                     )}
                     <div>
@@ -462,38 +631,48 @@ export default function PaymentsClient({
                       <p className="text-[10px] text-[var(--muted)] font-mono mt-0.5">ID: {selectedPayment.clerkUserId.slice(0, 12)}...</p>
                     </div>
                   </div>
-                </div>
+                </motion.div>
 
                 {/* Details Grid */}
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="rounded-xl border border-[var(--border)] bg-[var(--field-background)]/30 p-3.5">
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.15, type: 'spring', stiffness: 200, damping: 20 }}
+                  className="grid grid-cols-2 gap-4"
+                >
+                  <div className="rounded-xl border border-[var(--border)]/50 bg-[var(--field-background)]/30 backdrop-blur-sm p-3.5">
                     <div className="flex items-center gap-1.5 text-[10px] font-semibold text-[var(--muted)] uppercase mb-1.5">
                       <CreditCard className="h-3 w-3" /> Payment Method
                     </div>
                     <div className="text-sm font-semibold text-[var(--foreground)]">{getMethodBadge(selectedPayment.paymentMethod)}</div>
                   </div>
-                  <div className="rounded-xl border border-[var(--border)] bg-[var(--field-background)]/30 p-3.5">
+                  <div className="rounded-xl border border-[var(--border)]/50 bg-[var(--field-background)]/30 backdrop-blur-sm p-3.5">
                     <div className="flex items-center gap-1.5 text-[10px] font-semibold text-[var(--muted)] uppercase mb-1.5">
                       <Calendar className="h-3 w-3" /> Date & Time
                     </div>
                     <p className="text-sm font-semibold text-[var(--foreground)]">{formatDateTime(selectedPayment.paymentDate)}</p>
                   </div>
-                  <div className="rounded-xl border border-[var(--border)] bg-[var(--field-background)]/30 p-3.5">
+                  <div className="rounded-xl border border-[var(--border)]/50 bg-[var(--field-background)]/30 backdrop-blur-sm p-3.5">
                     <div className="flex items-center gap-1.5 text-[10px] font-semibold text-[var(--muted)] uppercase mb-1.5">
                       <Hash className="h-3 w-3" /> Days Added
                     </div>
                     <p className="text-sm font-semibold text-[var(--foreground)]">{selectedPayment.daysAdded} day{selectedPayment.daysAdded !== 1 ? 's' : ''}</p>
                   </div>
-                  <div className="rounded-xl border border-[var(--border)] bg-[var(--field-background)]/30 p-3.5">
+                  <div className="rounded-xl border border-[var(--border)]/50 bg-[var(--field-background)]/30 backdrop-blur-sm p-3.5">
                     <div className="flex items-center gap-1.5 text-[10px] font-semibold text-[var(--muted)] uppercase mb-1.5">
                       <FileText className="h-3 w-3" /> Plan
                     </div>
                     <p className="text-sm font-semibold text-[var(--foreground)]">{selectedPayment.planName ?? 'N/A'}</p>
                   </div>
-                </div>
+                </motion.div>
 
                 {/* Recorded By */}
-                <div className="rounded-xl border border-[var(--border)] bg-[var(--field-background)]/30 p-3.5">
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.2, type: 'spring', stiffness: 200, damping: 20 }}
+                  className="rounded-xl border border-[var(--border)]/50 bg-[var(--field-background)]/30 backdrop-blur-sm p-3.5"
+                >
                   <div className="flex items-center gap-1.5 text-[10px] font-semibold text-[var(--muted)] uppercase mb-1.5">
                     <UserCircle className="h-3 w-3" /> Recorded By
                   </div>
@@ -505,25 +684,35 @@ export default function PaymentsClient({
                   ) : (
                     <p className="text-sm text-[var(--muted)]">System / Online Payment</p>
                   )}
-                </div>
+                </motion.div>
 
                 {/* Notes */}
                 {selectedPayment.notes && (
-                  <div className="rounded-xl border border-[var(--border)] bg-[var(--field-background)]/30 p-3.5">
+                  <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.25, type: 'spring', stiffness: 200, damping: 20 }}
+                    className="rounded-xl border border-[var(--border)]/50 bg-[var(--field-background)]/30 backdrop-blur-sm p-3.5"
+                  >
                     <div className="flex items-center gap-1.5 text-[10px] font-semibold text-[var(--muted)] uppercase mb-1.5">
                       <FileText className="h-3 w-3" /> Notes
                     </div>
                     <p className="text-sm text-[var(--foreground)]">{selectedPayment.notes}</p>
-                  </div>
+                  </motion.div>
                 )}
 
                 {/* Transaction ID */}
-                <div className="text-center pt-2 border-t border-[var(--border)]">
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.3 }}
+                  className="text-center pt-2 border-t border-[var(--border)]/50"
+                >
                   <p className="text-[10px] text-[var(--muted)] font-mono">Transaction ID: {selectedPayment.id}</p>
                   <p className="text-[10px] text-[var(--muted)] font-mono mt-0.5">
                     Created: {formatDateTime(selectedPayment.createdAt)}
                   </p>
-                </div>
+                </motion.div>
               </div>
             </motion.div>
           </div>

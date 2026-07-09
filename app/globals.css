@@ -94,3 +94,9 @@
     --warning-foreground: oklch(17.38% 0.039 258.11);      
   }
 }
+
+@keyframes shimmer {
+  100% {
+    transform: translateX(100%);
+  }
+}

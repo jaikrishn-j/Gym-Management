@@ -180,18 +180,31 @@ export async function generateResetLink(staffId: string, email: string) {
       return { success: false, error: "You don't have permission to generate reset links" }
     }
 
-    const response = await fetch(`https://api.clerk.com/v1/users/${staffId}/password_reset_tokens`, {
+    const CLERK_SECRET_KEY = process.env.CLERK_SECRET_KEY
+
+    // Create a sign-in token directly — works for all users (with or without password)
+    // Sign-in tokens are one-time use. Admin generates a fresh token each time.
+    const response = await fetch('https://api.clerk.com/v1/sign_in_tokens', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${process.env.CLERK_SECRET_KEY}`,
+        'Authorization': `Bearer ${CLERK_SECRET_KEY}`,
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ expires_in_seconds: 86400 }),
+      body: JSON.stringify({ user_id: staffId, expires_in_seconds: 86400 }),
     })
 
     if (!response.ok) {
-      const errData = await response.json()
-      throw new Error(errData.errors?.[0]?.message || 'Failed to generate reset link')
+      let errorMessage = `HTTP ${response.status}: ${response.statusText}`
+      try {
+        const errData = await response.json()
+        errorMessage = errData.errors?.[0]?.message || errorMessage
+      } catch {
+        try {
+          const text = await response.text()
+          if (text) errorMessage = text
+        } catch { /* keep default */ }
+      }
+      throw new Error(errorMessage)
     }
 
     const data = await response.json()

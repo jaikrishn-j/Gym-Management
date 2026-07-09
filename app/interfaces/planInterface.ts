@@ -28,4 +28,5 @@ export interface PlanCardProps {
   onDelete?: (plan: Plan) => void;
   onToggleStatus?: (plan: Plan) => void;
   showActions?: boolean;
+  index?: number;
 }

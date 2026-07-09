@@ -581,9 +581,15 @@ export default function AdminSidebar({
           </div>
         </header>
 
-        <div className="min-h-screen flex-1 p-6">
+        <motion.div
+          key={pathname}
+          initial={{ opacity: 0, x: 10 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.3 }}
+          className="min-h-screen flex-1 p-6"
+        >
           {children}
-        </div>
+        </motion.div>
         <Footer />
       </motion.div>
 

@@ -187,52 +187,94 @@ const StaffEquipmentClient = ({
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-black text-[var(--foreground)]">Gym Equipment</h1>
-          <p className="text-sm text-[var(--muted)] mt-1">
-            View and manage gym equipment inventory
-          </p>
+      {/* Hero Header */}
+      <motion.div
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ type: 'spring', stiffness: 200, damping: 20 }}
+        className="bg-gradient-to-r from-[var(--accent)]/10 via-[var(--accent)]/5 to-transparent rounded-2xl border border-[var(--border)] p-6"
+      >
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-[var(--accent)]/20 to-[var(--accent)]/5 text-[var(--accent)] shadow-lg shadow-[var(--accent)]/10">
+              <Dumbbell className="h-7 w-7" />
+            </div>
+            <div>
+              <h1 className="text-2xl font-black text-[var(--foreground)]">Gym Equipment</h1>
+              <p className="text-sm text-[var(--muted)]">View and manage gym equipment inventory</p>
+            </div>
+          </div>
+          {canCreate && (
+            <motion.button
+              whileHover={{ scale: 1.02, boxShadow: '0 0 30px rgba(var(--accent), 0.3)' }}
+              whileTap={{ scale: 0.98 }}
+              onClick={() => { resetForm(); setShowCreateModal(true); }}
+              className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-[var(--accent)] to-[var(--accent)]/90 text-white font-semibold text-sm shadow-lg shadow-[var(--accent)]/20"
+            >
+              <Plus className="h-4 w-4" />
+              Add Equipment
+            </motion.button>
+          )}
         </div>
-        {canCreate && (
-          <motion.button
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-            onClick={() => {
-              resetForm();
-              setShowCreateModal(true);
-            }}
-            className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-blue-500 text-white font-semibold text-sm shadow-lg shadow-blue-500/20 hover:shadow-xl hover:shadow-blue-500/30 transition-all"
-          >
-            <Plus className="h-4 w-4" />
-            Add Equipment
-          </motion.button>
-        )}
-      </div>
+
+        {/* Stat Pills */}
+        <div className="flex items-center gap-4 mt-4 pt-4 border-t border-[var(--border)]/50">
+          <div className="flex items-center gap-2">
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[var(--accent)]/10">
+              <Dumbbell className="h-4 w-4 text-[var(--accent)]" />
+            </div>
+            <div>
+              <p className="text-[10px] text-[var(--muted)] font-semibold uppercase">Total</p>
+              <p className="text-sm font-bold text-[var(--foreground)]">{equipments.length}</p>
+            </div>
+          </div>
+          <div className="w-px h-8 bg-[var(--border)]" />
+          <div className="flex items-center gap-2">
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[var(--success)]/10">
+              <span className="h-4 w-4 text-[var(--success)]">✓</span>
+            </div>
+            <div>
+              <p className="text-[10px] text-[var(--muted)] font-semibold uppercase">Available</p>
+              <p className="text-sm font-bold text-[var(--success)]">{equipments.filter(e => e.status === 'available').length}</p>
+            </div>
+          </div>
+          <div className="w-px h-8 bg-[var(--border)]" />
+          <div className="flex items-center gap-2">
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[var(--warning)]/10">
+              <span className="h-4 w-4 text-[var(--warning)]">!</span>
+            </div>
+            <div>
+              <p className="text-[10px] text-[var(--muted)] font-semibold uppercase">Maintenance</p>
+              <p className="text-sm font-bold text-[var(--warning)]">{equipments.filter(e => e.status === 'maintenance').length}</p>
+            </div>
+          </div>
+        </div>
+      </motion.div>
 
       {/* Filters */}
-      <div className="flex flex-col sm:flex-row gap-3">
-        <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--muted)]" />
-          <input
-            type="text"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            placeholder="Search equipment..."
-            className="w-full h-12 pl-10 pr-4 rounded-xl border border-[var(--field-border)] bg-[var(--field-background)] text-[var(--foreground)] placeholder:text-[var(--muted)] font-medium outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/15 transition-all"
-          />
+      <div className="backdrop-blur-xl bg-[var(--surface)]/80 rounded-2xl border border-[var(--border)]/50 p-4">
+        <div className="flex flex-col sm:flex-row gap-3">
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--muted)]" />
+            <input
+              type="text"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              placeholder="Search equipment..."
+              className="w-full h-11 pl-10 pr-4 rounded-xl border border-[var(--field-border)] bg-[var(--field-background)] text-[var(--foreground)] placeholder:text-[var(--muted)] font-medium outline-none focus:border-[var(--accent)] focus:ring-4 focus:ring-[var(--accent)]/15 transition-all"
+            />
+          </div>
+          <select
+            value={filterStatus}
+            onChange={(e) => setFilterStatus(e.target.value)}
+            className="h-11 px-4 rounded-xl border border-[var(--field-border)] bg-[var(--field-background)] text-[var(--foreground)] font-medium outline-none focus:border-[var(--accent)] focus:ring-4 focus:ring-[var(--accent)]/15 transition-all min-w-[140px]"
+          >
+            <option value="all">All Status</option>
+            {EQUIPMENT_STATUS.map(status => (
+              <option key={status.value} value={status.value}>{status.label}</option>
+            ))}
+          </select>
         </div>
-        <select
-          value={filterStatus}
-          onChange={(e) => setFilterStatus(e.target.value)}
-          className="h-12 px-4 rounded-xl border border-[var(--field-border)] bg-[var(--field-background)] text-[var(--foreground)] font-medium outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/15 transition-all min-w-[140px]"
-        >
-          <option value="all">All Status</option>
-          {EQUIPMENT_STATUS.map(status => (
-            <option key={status.value} value={status.value}>{status.label}</option>
-          ))}
-        </select>
       </div>
 
       {/* Error */}
@@ -242,40 +284,66 @@ const StaffEquipmentClient = ({
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
-            className="flex items-center gap-3 rounded-2xl bg-red-500/10 border border-red-500/20 p-4"
+            className="flex items-center gap-3 rounded-2xl bg-[var(--danger)]/10 border border-[var(--danger)]/20 p-4"
           >
-            <AlertCircle className="h-5 w-5 text-red-500 shrink-0" />
-            <p className="text-sm text-red-500 font-medium">{error}</p>
-            <button
+            <AlertCircle className="h-5 w-5 text-[var(--danger)] shrink-0" />
+            <p className="text-sm text-[var(--danger)] font-medium">{error}</p>
+            <motion.button
+              whileHover={{ scale: 1.1, rotate: 90 }}
               onClick={() => setError('')}
               className="ml-auto"
             >
-              <X className="h-4 w-4 text-red-500" />
-            </button>
+              <X className="h-4 w-4 text-[var(--danger)]" />
+            </motion.button>
           </motion.div>
         )}
       </AnimatePresence>
 
       {/* Equipment Cards */}
       {filteredEquipments.length === 0 ? (
-        <div className="text-center py-20">
-          <Dumbbell className="h-12 w-12 text-[var(--muted)] mx-auto mb-3" />
-          <p className="text-[var(--muted)] text-lg">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ type: 'spring', stiffness: 200, damping: 20 }}
+          className="text-center py-16"
+        >
+          <motion.div
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            transition={{ delay: 0.1, type: 'spring', stiffness: 300, damping: 15 }}
+            className="flex h-16 w-16 items-center justify-center rounded-3xl bg-[var(--surface-secondary)] mx-auto mb-4"
+          >
+            <Dumbbell className="h-8 w-8 text-[var(--muted)]" />
+          </motion.div>
+          <p className="text-sm font-semibold text-[var(--foreground)]">
             {searchTerm || filterStatus !== 'all' ? 'No equipment found matching your filters' : 'No equipment added yet'}
           </p>
-        </div>
+        </motion.div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredEquipments.map((equipment) => (
-            <EquipmentCard
+        <motion.div
+          initial="hidden"
+          animate="visible"
+          variants={{ visible: { transition: { staggerChildren: 0.05 } } }}
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+        >
+          {filteredEquipments.map((equipment, idx) => (
+            <motion.div
               key={equipment.id}
-              equipment={equipment}
-              onEdit={canUpdate ? handleEdit : undefined}
-              onDelete={canDelete ? (eq) => setShowDeleteConfirm(eq) : undefined}
-              showActions={canUpdate || canDelete}
-            />
+              variants={{
+                hidden: { opacity: 0, y: 20 },
+                visible: { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 200, damping: 20 } }
+              }}
+            >
+              <EquipmentCard
+                equipment={equipment}
+                index={idx}
+                onEdit={canUpdate ? handleEdit : undefined}
+                onDelete={canDelete ? (eq) => setShowDeleteConfirm(eq) : undefined}
+                showActions={canUpdate || canDelete}
+              />
+            </motion.div>
           ))}
-        </div>
+        </motion.div>
       )}
 
       {/* Create/Edit Modal */}
@@ -297,13 +365,16 @@ const StaffEquipmentClient = ({
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 20 }}
               transition={{ duration: 0.2 }}
-              className="relative w-full max-w-lg max-h-[85vh] overflow-y-auto rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-6 shadow-2xl z-10"
+              className="relative w-full max-w-lg max-h-[85vh] overflow-y-auto rounded-2xl border border-[var(--border)]/50 bg-[var(--surface)]/95 backdrop-blur-xl p-6 shadow-2xl z-10"
             >
+              {/* Decorative accent bar */}
+              <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[var(--accent)] via-[var(--accent)]/50 to-transparent rounded-t-2xl" />
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-xl font-bold text-[var(--foreground)]">
                   {editingEquipment ? 'Edit Equipment' : 'Add New Equipment'}
                 </h2>
-                <button
+                <motion.button
+                  whileHover={{ scale: 1.1, rotate: 90 }}
                   onClick={() => {
                     setShowCreateModal(false);
                     resetForm();
@@ -311,12 +382,16 @@ const StaffEquipmentClient = ({
                   className="h-8 w-8 flex items-center justify-center rounded-lg hover:bg-[var(--surface-secondary)] transition-colors"
                 >
                   <X className="h-5 w-5 text-[var(--muted)]" />
-                </button>
+                </motion.button>
               </div>
 
               <form onSubmit={handleSubmit} className="space-y-4">
                 {/* Equipment Name */}
-                <div>
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0 }}
+                >
                   <label className="block text-sm font-semibold text-[var(--foreground)]/80 mb-1.5">
                     Equipment Name *
                   </label>
@@ -325,13 +400,17 @@ const StaffEquipmentClient = ({
                     value={formData.name}
                     onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
                     placeholder="e.g., Treadmill, Bench Press"
-                    className="w-full h-12 px-4 rounded-xl border border-[var(--field-border)] bg-[var(--field-background)] text-[var(--foreground)] placeholder:text-[var(--muted)] font-medium outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/15 transition-all"
+                    className="w-full h-12 px-4 rounded-xl border border-[var(--field-border)] bg-[var(--field-background)] text-[var(--foreground)] placeholder:text-[var(--muted)] font-medium outline-none focus:border-[var(--accent)] focus:ring-4 focus:ring-[var(--accent)]/15 transition-all"
                     required
                   />
-                </div>
+                </motion.div>
 
                 {/* Description */}
-                <div>
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.05 }}
+                >
                   <label className="block text-sm font-semibold text-[var(--foreground)]/80 mb-1.5">
                     Description
                   </label>
@@ -340,12 +419,17 @@ const StaffEquipmentClient = ({
                     onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
                     placeholder="Describe the equipment..."
                     rows={3}
-                    className="w-full px-4 py-3 rounded-xl border border-[var(--field-border)] bg-[var(--field-background)] text-[var(--foreground)] placeholder:text-[var(--muted)] font-medium outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/15 transition-all resize-none"
+                    className="w-full px-4 py-3 rounded-xl border border-[var(--field-border)] bg-[var(--field-background)] text-[var(--foreground)] placeholder:text-[var(--muted)] font-medium outline-none focus:border-[var(--accent)] focus:ring-4 focus:ring-[var(--accent)]/15 transition-all resize-none"
                   />
-                </div>
+                </motion.div>
 
                 {/* Category & Quantity */}
-                <div className="grid grid-cols-2 gap-3">
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.1 }}
+                  className="grid grid-cols-2 gap-3"
+                >
                   <div>
                     <label className="block text-sm font-semibold text-[var(--foreground)]/80 mb-1.5">
                       Category *
@@ -353,7 +437,7 @@ const StaffEquipmentClient = ({
                     <select
                       value={formData.category}
                       onChange={(e) => setFormData(prev => ({ ...prev, category: e.target.value }))}
-                      className="w-full h-12 px-4 rounded-xl border border-[var(--field-border)] bg-[var(--field-background)] text-[var(--foreground)] font-medium outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/15 transition-all"
+                      className="w-full h-12 px-4 rounded-xl border border-[var(--field-border)] bg-[var(--field-background)] text-[var(--foreground)] font-medium outline-none focus:border-[var(--accent)] focus:ring-4 focus:ring-[var(--accent)]/15 transition-all"
                     >
                       {CATEGORIES.map(cat => (
                         <option key={cat.value} value={cat.value}>{cat.label}</option>
@@ -369,14 +453,19 @@ const StaffEquipmentClient = ({
                       value={formData.quantity}
                       onChange={(e) => setFormData(prev => ({ ...prev, quantity: parseInt(e.target.value) || 1 }))}
                       min="1"
-                      className="w-full h-12 px-4 rounded-xl border border-[var(--field-border)] bg-[var(--field-background)] text-[var(--foreground)] placeholder:text-[var(--muted)] font-medium outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/15 transition-all"
+                      className="w-full h-12 px-4 rounded-xl border border-[var(--field-border)] bg-[var(--field-background)] text-[var(--foreground)] placeholder:text-[var(--muted)] font-medium outline-none focus:border-[var(--accent)] focus:ring-4 focus:ring-[var(--accent)]/15 transition-all"
                       required
                     />
                   </div>
-                </div>
+                </motion.div>
 
                 {/* Status & Location */}
-                <div className="grid grid-cols-2 gap-3">
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.15 }}
+                  className="grid grid-cols-2 gap-3"
+                >
                   <div>
                     <label className="block text-sm font-semibold text-[var(--foreground)]/80 mb-1.5">
                       Status *
@@ -384,7 +473,7 @@ const StaffEquipmentClient = ({
                     <select
                       value={formData.status}
                       onChange={(e) => setFormData(prev => ({ ...prev, status: e.target.value }))}
-                      className="w-full h-12 px-4 rounded-xl border border-[var(--field-border)] bg-[var(--field-background)] text-[var(--foreground)] font-medium outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/15 transition-all"
+                      className="w-full h-12 px-4 rounded-xl border border-[var(--field-border)] bg-[var(--field-background)] text-[var(--foreground)] font-medium outline-none focus:border-[var(--accent)] focus:ring-4 focus:ring-[var(--accent)]/15 transition-all"
                     >
                       {EQUIPMENT_STATUS.map(status => (
                         <option key={status.value} value={status.value}>{status.label}</option>
@@ -400,13 +489,18 @@ const StaffEquipmentClient = ({
                       value={formData.location}
                       onChange={(e) => setFormData(prev => ({ ...prev, location: e.target.value }))}
                       placeholder="e.g., Zone A, Floor 2"
-                      className="w-full h-12 px-4 rounded-xl border border-[var(--field-border)] bg-[var(--field-background)] text-[var(--foreground)] placeholder:text-[var(--muted)] font-medium outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/15 transition-all"
+                      className="w-full h-12 px-4 rounded-xl border border-[var(--field-border)] bg-[var(--field-background)] text-[var(--foreground)] placeholder:text-[var(--muted)] font-medium outline-none focus:border-[var(--accent)] focus:ring-4 focus:ring-[var(--accent)]/15 transition-all"
                     />
                   </div>
-                </div>
+                </motion.div>
 
                 {/* Dates */}
-                <div className="grid grid-cols-2 gap-3">
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.2 }}
+                  className="grid grid-cols-2 gap-3"
+                >
                   <div>
                     <label className="block text-sm font-semibold text-[var(--foreground)]/80 mb-1.5">
                       Purchase Date
@@ -415,7 +509,7 @@ const StaffEquipmentClient = ({
                       type="date"
                       value={formData.purchaseDate}
                       onChange={(e) => setFormData(prev => ({ ...prev, purchaseDate: e.target.value }))}
-                      className="w-full h-12 px-4 rounded-xl border border-[var(--field-border)] bg-[var(--field-background)] text-[var(--foreground)] font-medium outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/15 transition-all"
+                      className="w-full h-12 px-4 rounded-xl border border-[var(--field-border)] bg-[var(--field-background)] text-[var(--foreground)] font-medium outline-none focus:border-[var(--accent)] focus:ring-4 focus:ring-[var(--accent)]/15 transition-all"
                     />
                   </div>
                   <div>
@@ -427,13 +521,18 @@ const StaffEquipmentClient = ({
                       value={formData.imageUrl}
                       onChange={(e) => setFormData(prev => ({ ...prev, imageUrl: e.target.value }))}
                       placeholder="https://..."
-                      className="w-full h-12 px-4 rounded-xl border border-[var(--field-border)] bg-[var(--field-background)] text-[var(--foreground)] placeholder:text-[var(--muted)] font-medium outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/15 transition-all"
+                      className="w-full h-12 px-4 rounded-xl border border-[var(--field-border)] bg-[var(--field-background)] text-[var(--foreground)] placeholder:text-[var(--muted)] font-medium outline-none focus:border-[var(--accent)] focus:ring-4 focus:ring-[var(--accent)]/15 transition-all"
                     />
                   </div>
-                </div>
+                </motion.div>
 
                 {/* Maintenance Dates */}
-                <div className="grid grid-cols-2 gap-3">
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.25 }}
+                  className="grid grid-cols-2 gap-3"
+                >
                   <div>
                     <label className="block text-sm font-semibold text-[var(--foreground)]/80 mb-1.5">
                       Last Maintenance
@@ -442,7 +541,7 @@ const StaffEquipmentClient = ({
                       type="date"
                       value={formData.lastMaintenance}
                       onChange={(e) => setFormData(prev => ({ ...prev, lastMaintenance: e.target.value }))}
-                      className="w-full h-12 px-4 rounded-xl border border-[var(--field-border)] bg-[var(--field-background)] text-[var(--foreground)] font-medium outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/15 transition-all"
+                      className="w-full h-12 px-4 rounded-xl border border-[var(--field-border)] bg-[var(--field-background)] text-[var(--foreground)] font-medium outline-none focus:border-[var(--accent)] focus:ring-4 focus:ring-[var(--accent)]/15 transition-all"
                     />
                   </div>
                   <div>
@@ -453,27 +552,31 @@ const StaffEquipmentClient = ({
                       type="date"
                       value={formData.nextMaintenance}
                       onChange={(e) => setFormData(prev => ({ ...prev, nextMaintenance: e.target.value }))}
-                      className="w-full h-12 px-4 rounded-xl border border-[var(--field-border)] bg-[var(--field-background)] text-[var(--foreground)] font-medium outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/15 transition-all"
+                      className="w-full h-12 px-4 rounded-xl border border-[var(--field-border)] bg-[var(--field-background)] text-[var(--foreground)] font-medium outline-none focus:border-[var(--accent)] focus:ring-4 focus:ring-[var(--accent)]/15 transition-all"
                     />
                   </div>
-                </div>
+                </motion.div>
 
                 {/* Submit */}
                 <div className="flex gap-3 pt-2">
-                  <button
+                  <motion.button
                     type="button"
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
                     onClick={() => {
                       setShowCreateModal(false);
                       resetForm();
                     }}
-                    className="flex-1 h-12 rounded-xl border-2 border-[var(--border)] bg-[var(--field-background)] text-[var(--foreground)] font-semibold hover:bg-blue-500/5 transition-colors"
+                    className="flex-1 h-12 rounded-xl border-2 border-[var(--border)] bg-[var(--field-background)] text-[var(--foreground)] font-semibold hover:bg-[var(--accent)]/5 transition-colors"
                   >
                     Cancel
-                  </button>
-                  <button
+                  </motion.button>
+                  <motion.button
                     type="submit"
+                    whileHover={{ scale: 1.02, boxShadow: '0 0 30px rgba(var(--accent), 0.3)' }}
+                    whileTap={{ scale: 0.98 }}
                     disabled={isSaving}
-                    className="flex-1 h-12 rounded-xl bg-blue-500 text-white font-semibold shadow-lg shadow-blue-500/20 hover:shadow-xl hover:shadow-blue-500/30 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+                    className="flex-1 h-12 rounded-xl bg-gradient-to-r from-[var(--accent)] to-[var(--accent)]/90 text-white font-semibold shadow-lg shadow-[var(--accent)]/20 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
                   >
                     {isSaving ? (
                       <Loader2 className="h-4 w-4 animate-spin" />
@@ -483,7 +586,7 @@ const StaffEquipmentClient = ({
                         {editingEquipment ? 'Update Equipment' : 'Add Equipment'}
                       </>
                     )}
-                  </button>
+                  </motion.button>
                 </div>
               </form>
             </motion.div>
@@ -506,8 +609,10 @@ const StaffEquipmentClient = ({
               initial={{ opacity: 0, scale: 0.95, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 20 }}
-              className="relative w-full max-w-sm rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-6 shadow-2xl z-10"
+              className="relative w-full max-w-sm rounded-2xl border border-[var(--border)]/50 bg-[var(--surface)]/95 backdrop-blur-xl p-6 shadow-2xl z-10"
             >
+              {/* Decorative blur circle */}
+              <div className="absolute -top-20 -right-20 w-40 h-40 bg-[var(--danger)]/10 rounded-full blur-3xl pointer-events-none" />
               <div className="flex items-center gap-3 text-[var(--danger)] mb-3">
                 <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-[var(--danger)]/10 shrink-0">
                   <AlertCircle className="h-5 w-5" />
@@ -518,17 +623,21 @@ const StaffEquipmentClient = ({
                 Are you sure you want to delete "{showDeleteConfirm.name}"? This action cannot be undone.
               </p>
               <div className="flex items-center justify-end gap-3">
-                <button
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
                   disabled={isDeleting}
                   onClick={() => setShowDeleteConfirm(null)}
                   className="px-4 py-2 text-sm font-semibold text-[var(--foreground)]/70 hover:text-[var(--foreground)] hover:bg-[var(--surface-secondary)] rounded-xl transition-all disabled:opacity-50"
                 >
                   Cancel
-                </button>
-                <button
+                </motion.button>
+                <motion.button
+                  whileHover={{ scale: 1.02, boxShadow: '0 0 30px rgba(var(--danger), 0.3)' }}
+                  whileTap={{ scale: 0.98 }}
                   disabled={isDeleting}
                   onClick={handleDelete}
-                  className="flex items-center gap-2 bg-[var(--danger)] text-[var(--danger-foreground)] px-4 py-2 text-sm font-semibold rounded-xl shadow-lg shadow-[var(--danger)]/10 transition-all disabled:opacity-50"
+                  className="flex items-center gap-2 bg-gradient-to-r from-[var(--danger)] to-[var(--danger)]/80 text-white px-4 py-2 text-sm font-semibold rounded-xl shadow-lg shadow-[var(--danger)]/20 transition-all disabled:opacity-50"
                 >
                   {isDeleting ? (
                     <Loader2 className="h-4 w-4 animate-spin" />
@@ -538,7 +647,7 @@ const StaffEquipmentClient = ({
                       Delete
                     </>
                   )}
-                </button>
+                </motion.button>
               </div>
             </motion.div>
           </div>

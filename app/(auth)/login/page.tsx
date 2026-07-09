@@ -19,6 +19,7 @@ import {
   Loader2
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export default function SignInPage() {
@@ -512,6 +513,14 @@ export default function SignInPage() {
                           <Eye className="h-5 w-5" />
                         )}
                       </button>
+                    </div>
+                    <div className="flex justify-end mt-1">
+                      <Link
+                        href="/forgot-password"
+                        className="text-sm text-[var(--accent)] font-semibold hover:underline"
+                      >
+                        Forgot Password?
+                      </Link>
                     </div>
                   </div>
 

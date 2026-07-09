@@ -14,10 +14,7 @@ import {
 } from 'lucide-react';
 import { Plan, PlanCardProps } from '@/app/interfaces/planInterface';
 
-
-
-
-const PlanCard = ({ plan, onEdit, onDelete, onToggleStatus, showActions = false }: PlanCardProps) => {
+const PlanCard = ({ plan, onEdit, onDelete, onToggleStatus, showActions = false, index = 0 }: PlanCardProps) => {
   const discount = plan.offerPrice 
     ? Math.round(((plan.price - plan.offerPrice) / plan.price) * 100)
     : 0;
@@ -59,61 +56,60 @@ const PlanCard = ({ plan, onEdit, onDelete, onToggleStatus, showActions = false 
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20 }}
+      initial={{ opacity: 0, y: 30 }}
       animate={{ opacity: 1, y: 0 }}
-      whileHover={{ y: -5 }}
-      transition={{ duration: 0.3 }}
+      whileHover={{ y: -6, boxShadow: '0 20px 60px rgba(0,0,0,0.1)' }}
+      transition={{ delay: index * 0.05, type: 'spring', stiffness: 200, damping: 20 }}
       className="relative group h-full"
     >
       <div className={`
-        relative rounded-2xl border overflow-hidden h-full flex flex-col
+        relative rounded-2xl border overflow-hidden h-full flex flex-col backdrop-blur-xl bg-[var(--surface)]/80
         ${plan.offerPrice 
-          ? 'border-[var(--accent)] bg-[var(--surface)] shadow-lg shadow-[var(--accent)]/10' 
-          : 'border-[var(--border)] bg-[var(--surface)]'
+          ? 'border-[var(--accent)]/50 ring-2 ring-[var(--accent)] shadow-lg shadow-[var(--accent)]/10' 
+          : 'border-[var(--border)]/50'
         }
       `}>
-        {/* Discount Badge */}
-        {discount > 0 && (
+        {/* Recommended Badge */}
+        {plan.offerPrice && (
           <div className="absolute top-4 right-4 z-10">
             <motion.div
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
               transition={{ type: "spring", stiffness: 300, damping: 20 }}
-              className="flex items-center gap-1 px-3 py-1 rounded-full bg-[var(--accent)] text-[var(--accent-foreground)] text-xs font-bold"
+              className="flex items-center gap-1 px-3 py-1 rounded-full bg-gradient-to-r from-[var(--accent)] to-[var(--accent)]/80 text-[var(--accent-foreground)] text-xs font-bold shadow-lg shadow-[var(--accent)]/20"
             >
-              <Zap className="h-3 w-3" />
-              {discount}% OFF
+              ⭐ Recommended
             </motion.div>
           </div>
         )}
 
         {/* Plan Content */}
         <div className="p-6 flex-1 flex flex-col">
-          <div className="flex items-center gap-3 mb-3">
-            <div className={`
-              flex h-12 w-12 items-center justify-center rounded-xl shrink-0
-              ${plan.offerPrice 
-                ? 'bg-[var(--accent)] shadow-lg shadow-[var(--accent)]/20' 
-                : 'bg-[var(--surface-secondary)]'
-              }
-            `}>
-              <PlanIcon className={`h-6 w-6 ${plan.offerPrice ? 'text-[var(--accent-foreground)]' : 'text-[var(--foreground)]'}`} />
-            </div>
-            <div>
-              <h3 className="text-lg font-bold text-[var(--foreground)]">
-                {plan.name}
-              </h3>
-              {!plan.isActive && (
-                <span className="text-xs text-red-500 font-medium">Inactive</span>
-              )}
-            </div>
+          {/* Icon Container with Gradient */}
+          <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-[var(--accent)]/20 to-[var(--accent)]/5 text-[var(--accent)] shadow-lg shadow-[var(--accent)]/10 mb-4">
+            <PlanIcon className="h-7 w-7" />
+          </div>
+
+          {/* Name + Inline Status Pill */}
+          <div className="flex items-start justify-between gap-2 mb-2">
+            <h3 className="text-lg font-bold text-[var(--foreground)]">
+              {plan.name}
+            </h3>
+            <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider shrink-0 ${
+              plan.isActive 
+                ? 'bg-green-500/10 text-green-500' 
+                : 'bg-gray-500/10 text-gray-500'
+            }`}>
+              <span className={`h-1.5 w-1.5 rounded-full ${plan.isActive ? 'bg-green-500 animate-pulse' : 'bg-gray-500'}`} />
+              {plan.isActive ? 'Active' : 'Inactive'}
+            </span>
           </div>
 
           <p className="text-sm text-[var(--muted)] mb-4 line-clamp-2">
             {plan.description}
           </p>
 
-          {/* Price with Indian formatting */}
+          {/* Price Section */}
           <div className="mb-4">
             {plan.offerPrice ? (
               <div className="flex items-baseline gap-2 flex-wrap">
@@ -133,14 +129,19 @@ const PlanCard = ({ plan, onEdit, onDelete, onToggleStatus, showActions = false 
                 <span className="text-sm text-[var(--muted)]">{billingText}</span>
               </div>
             )}
+            {discount > 0 && (
+              <span className="text-[10px] font-bold text-green-500 bg-green-500/10 px-2 py-0.5 rounded-full mt-1 inline-block">
+                Save {discount}%
+              </span>
+            )}
           </div>
 
           {/* Features */}
           <div className="space-y-2.5 flex-1">
-            {plan.features.map((feature, index) => (
-              <div key={index} className="flex items-start gap-2">
-                <div className="flex h-5 w-5 items-center justify-center rounded-full bg-[var(--accent)]/10 shrink-0 mt-0.5">
-                  <Check className="h-3 w-3 text-[var(--accent)]" />
+            {plan.features.map((feature, idx) => (
+              <div key={idx} className="flex items-start gap-2">
+                <div className="flex h-5 w-5 items-center justify-center rounded-full bg-gradient-to-br from-green-400/20 to-green-500/10 shrink-0 mt-0.5">
+                  <Check className="h-3 w-3 text-green-500" />
                 </div>
                 <span className="text-sm text-[var(--foreground)]/70">
                   {feature}
@@ -150,40 +151,42 @@ const PlanCard = ({ plan, onEdit, onDelete, onToggleStatus, showActions = false 
           </div>
         </div>
 
-        {/* Action Buttons */}
+        {/* Action Buttons - Compact Icon Row */}
         {showActions && (
-          <div className="px-6 py-4 border-t border-[var(--border)] bg-[var(--surface-secondary)]/50 mt-auto">
-            <div className="flex gap-2">
+          <div className="px-6 py-3 border-t border-[var(--border)]/50 bg-[var(--surface-secondary)]/30 mt-auto">
+            <div className="flex items-center justify-center gap-1">
               <motion.button
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.9 }}
                 onClick={() => onEdit?.(plan)}
-                className="flex-1 flex items-center justify-center gap-2 h-10 rounded-xl bg-[var(--surface)] border border-[var(--border)] text-sm font-medium text-[var(--foreground)] hover:bg-[var(--accent)]/5 transition-colors"
+                className="group relative flex h-9 w-9 items-center justify-center rounded-lg hover:bg-[var(--accent)]/10 text-[var(--muted)] hover:text-[var(--accent)] transition-all"
+                title="Edit plan"
               >
                 <Edit className="h-4 w-4" />
-                Edit
               </motion.button>
+              <div className="w-px h-6 bg-[var(--border)]/30" />
               <motion.button
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.9 }}
                 onClick={() => onToggleStatus?.(plan)}
-                className={`flex-1 flex items-center justify-center gap-2 h-10 rounded-xl border text-sm font-medium transition-all ${
+                className={`group relative flex h-9 w-9 items-center justify-center rounded-lg transition-all ${
                   plan.isActive
-                    ? 'bg-red-500/10 border-red-500/20 text-red-500 hover:bg-red-500/20'
-                    : 'bg-green-500/10 border-green-500/20 text-green-500 hover:bg-green-500/20'
+                    ? 'text-[var(--muted)] hover:bg-red-500/10 hover:text-red-500'
+                    : 'text-[var(--muted)] hover:bg-green-500/10 hover:text-green-500'
                 }`}
+                title={plan.isActive ? 'Deactivate plan' : 'Activate plan'}
               >
                 <Power className="h-4 w-4" />
-                {plan.isActive ? 'Deactivate' : 'Activate'}
               </motion.button>
+              <div className="w-px h-6 bg-[var(--border)]/30" />
               <motion.button
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.9 }}
                 onClick={() => onDelete?.(plan)}
-                className="flex-1 flex items-center justify-center gap-2 h-10 rounded-xl bg-[var(--danger)]/10 border border-[var(--danger)]/20 text-sm font-medium text-[var(--danger)] hover:bg-[var(--danger)]/20 transition-colors"
+                className="group relative flex h-9 w-9 items-center justify-center rounded-lg hover:bg-[var(--danger)]/10 text-[var(--muted)] hover:text-[var(--danger)] transition-all"
+                title="Delete plan"
               >
                 <Trash2 className="h-4 w-4" />
-                Delete
               </motion.button>
             </div>
           </div>

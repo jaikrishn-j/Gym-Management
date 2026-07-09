@@ -195,6 +195,7 @@ const TrainerClient = ({
     } catch (err: any) {
       console.error('Error generating share link:', err);
       setError(err.message || 'Failed to generate share link');
+      toast.error(err.message || 'Failed to generate share link');
     } finally {
       setIsGeneratingLink(false);
     }
@@ -766,7 +767,7 @@ const TrainerClient = ({
                 </a>
               </div>
 
-              <p className="mt-3 text-xs text-[var(--muted)]">This link will expire in 24 hours for security purposes.</p>
+              <p className="mt-3 text-xs text-[var(--muted)]">This is a one-time use link that expires in 24 hours. Share it with the staff member so they can sign in and set up their account.</p>
             </motion.div>
           </div>
         )}

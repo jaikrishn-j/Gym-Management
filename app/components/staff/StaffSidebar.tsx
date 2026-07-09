@@ -257,9 +257,14 @@ export default function StaffSidebar({
       >
         <div className="h-16 flex items-center justify-between px-4 border-b border-[var(--border)] shrink-0">
           <div className="flex items-center gap-2 overflow-hidden">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-blue-500 to-blue-600 shrink-0">
+            <motion.div
+              initial={{ scale: 0, rotate: -180 }}
+              animate={{ scale: 1, rotate: 0 }}
+              transition={{ type: 'spring', stiffness: 260, damping: 20, delay: 0.1 }}
+              className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-blue-500 to-blue-600 shrink-0"
+            >
               <Dumbbell className="h-4 w-4 text-white" />
-            </div>
+            </motion.div>
             <AnimatePresence mode="wait">
               {(!isSidebarCollapsed || isMobile) && (
                 <motion.span
@@ -414,12 +419,19 @@ export default function StaffSidebar({
         <header className="sticky top-0 z-30 h-16 border-b border-[var(--border)] bg-[var(--surface)]/80 backdrop-blur-xl shrink-0">
           <div className="flex items-center justify-between h-full px-6">
             <div className="flex items-center gap-3">
-              <button
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
                 onClick={() => setIsMobileSidebarOpen(true)}
                 className="lg:hidden h-10 w-10 flex items-center justify-center rounded-xl hover:bg-[var(--surface-secondary)] transition-colors"
               >
-                <Menu className="h-5 w-5 text-[var(--foreground)]" />
-              </button>
+                <motion.div
+                  animate={isMobileSidebarOpen ? { rotate: 90 } : { rotate: 0 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  <Menu className="h-5 w-5 text-[var(--foreground)]" />
+                </motion.div>
+              </motion.button>
               
               {currentPage && (() => {
                 const PageIcon = currentPage.icon;
@@ -439,7 +451,11 @@ export default function StaffSidebar({
 
             <div className="flex items-center gap-3">
               <div ref={notificationsRef} className="relative">
-                <button
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  animate={notificationCount > 0 ? { rotate: [0, -10, 10, -10, 0] } : {}}
+                  transition={{ duration: 0.5 }}
                   onClick={() => {
                     setIsNotificationsOpen(!isNotificationsOpen);
                     setIsAccountOpen(false);
@@ -448,11 +464,16 @@ export default function StaffSidebar({
                 >
                   <Bell className="h-5 w-5 text-[var(--muted)]" />
                   {notificationCount > 0 && (
-                    <span className="absolute -top-0.5 -right-0.5 h-5 w-5 rounded-full bg-[var(--danger)] text-[10px] text-white font-bold flex items-center justify-center">
+                    <motion.span
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      transition={{ type: 'spring', stiffness: 300, damping: 15 }}
+                      className="absolute -top-0.5 -right-0.5 h-5 w-5 rounded-full bg-[var(--danger)] text-[10px] text-white font-bold flex items-center justify-center"
+                    >
                       {notificationCount}
-                    </span>
+                    </motion.span>
                   )}
-                </button>
+                </motion.button>
 
                 <AnimatePresence>
                   {isNotificationsOpen && (
@@ -632,9 +653,17 @@ export default function StaffSidebar({
           </div>
         </header>
 
-        <div className="min-h-screen flex-1 p-6">
-          {children}
-        </div>
+        <motion.main
+          key={pathname}
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.2, ease: 'easeOut' }}
+          className="flex-1"
+        >
+          <div className="min-h-screen p-6">
+            {children}
+          </div>
+        </motion.main>
         <Footer />
       </motion.div>
 

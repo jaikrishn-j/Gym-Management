@@ -16,7 +16,8 @@ import {
   getRecentPayments, getAttendanceTrend, DashboardStats,
   MonthlyRevenue, PlanDistribution, RecentPayment, AttendanceTrend
 } from '@/app/staff/dashboard/action';
-import { StaffDashboardSkeleton } from '@/app/components/shared/Skeleton';
+import { motion } from 'framer-motion';
+import { StaffDashboardSkeleton } from '@/app/components/shared/LoadingState';
 
 const COLORS = ['#22c55e', '#3b82f6', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899', '#14b8a6', '#f97316'];
 const ANALYTICS_TABS = [
@@ -26,36 +27,49 @@ const ANALYTICS_TABS = [
   { key: 'plans', label: 'Plans', icon: BarChart3 },
 ];
 
-function StatCard({ icon: Icon, label, value, sublabel, color }: {
+function StatCard({ icon: Icon, label, value, sublabel, color, index = 0 }: {
   icon: React.ElementType; label: string; value: string | number | undefined;
-  sublabel?: string; color: string;
+  sublabel?: string; color: string; index?: number;
 }) {
   if (value === undefined) return null;
   return (
-    <div className="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-5 transition-all hover:shadow-md">
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: index * 0.1, type: 'spring', stiffness: 200, damping: 20 }}
+      whileHover={{ y: -2, boxShadow: '0 8px 25px rgba(0,0,0,0.08)' }}
+      className="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-5 transition-all"
+    >
       <div className="flex items-start justify-between">
         <div>
           <p className="text-sm font-medium text-[var(--muted)]">{label}</p>
           <p className="text-2xl font-bold text-[var(--foreground)] mt-1">{value}</p>
           {sublabel && <p className="text-xs text-[var(--muted)] mt-1">{sublabel}</p>}
         </div>
-        <div className="flex h-10 w-10 items-center justify-center rounded-xl" style={{ backgroundColor: `${color}15` }}>
+        <motion.div
+          whileHover={{ scale: 1.1, rotate: 5 }}
+          className="flex h-10 w-10 items-center justify-center rounded-xl" style={{ backgroundColor: `${color}15` }}>
           <Icon className="h-5 w-5" style={{ color }} />
-        </div>
+        </motion.div>
       </div>
-    </div>
+    </motion.div>
   );
 }
 
-function ChartCard({ title, subtitle, children }: { title: string; subtitle?: string; children: React.ReactNode }) {
+function ChartCard({ title, subtitle, children, delay = 0 }: { title: string; subtitle?: string; children: React.ReactNode; delay?: number }) {
   return (
-    <div className="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-5">
+    <motion.div
+      initial={{ opacity: 0, y: 30 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay, type: 'spring', stiffness: 150, damping: 20 }}
+      className="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-5"
+    >
       <div className="mb-4">
         <h3 className="text-sm font-semibold text-[var(--foreground)]">{title}</h3>
         {subtitle && <p className="text-xs text-[var(--muted)] mt-0.5">{subtitle}</p>}
       </div>
       {children}
-    </div>
+    </motion.div>
   );
 }
 
@@ -125,19 +139,24 @@ export default function StaffDashboardClient() {
       {/* Stat Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard icon={Users} label="Total Members" value={stats?.totalMembers}
-          sublabel={`${stats?.todayCheckIns ?? 0} checked in today`} color="#22c55e" />
+          sublabel={`${stats?.todayCheckIns ?? 0} checked in today`} color="#22c55e" index={0} />
         <StatCard icon={Activity} label="Active Members" value={stats?.activeMembers}
-          sublabel={canViewMembers ? 'Currently active plans' : undefined} color="#3b82f6" />
+          sublabel={canViewMembers ? 'Currently active plans' : undefined} color="#3b82f6" index={1} />
         <StatCard icon={IndianRupee} label="Revenue This Month"
           value={stats?.thisMonthRevenue !== undefined ? `₹${stats.thisMonthRevenue.toLocaleString('en-IN')}` : undefined}
-          sublabel={canViewPayments ? `Total: ₹${(stats?.totalRevenue ?? 0).toLocaleString('en-IN')}` : undefined} color="#f59e0b" />
+          sublabel={canViewPayments ? `Total: ₹${(stats?.totalRevenue ?? 0).toLocaleString('en-IN')}` : undefined} color="#f59e0b" index={2} />
         <StatCard icon={CalendarCheck} label="Pending Requests" value={stats?.pendingRequests}
-          sublabel="Awaiting approval" color="#ef4444" />
+          sublabel="Awaiting approval" color="#ef4444" index={3} />
       </div>
 
       {/* No permissions state */}
       {!canViewMembers && !canViewPayments && !canViewAnalytics && (
-        <div className="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-8 text-center">
+        <motion.div
+          initial={{ opacity: 0, y: 20, scale: 0.95 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          transition={{ type: 'spring', stiffness: 200, damping: 20 }}
+          className="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-8 text-center"
+        >
           <Dumbbell className="h-12 w-12 mx-auto text-[var(--muted)] mb-3" />
           <h3 className="text-lg font-semibold text-[var(--foreground)]">Welcome to Staff Dashboard</h3>
           <p className="text-sm text-[var(--muted)] mt-2 max-w-md mx-auto">
@@ -147,32 +166,43 @@ export default function StaffDashboardClient() {
             className="mt-4 inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[var(--accent)] text-white text-sm font-semibold hover:opacity-90 transition-opacity">
             Go to Members <ChevronRight className="h-4 w-4" />
           </button>
-        </div>
+        </motion.div>
       )}
 
       {/* Quick Actions */}
       {(canViewMembers || canViewPayments) && (
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <motion.div
+          initial="hidden"
+          animate="visible"
+          variants={{ hidden: {}, visible: { transition: { staggerChildren: 0.1, delayChildren: 0.2 } } }}
+          className="grid grid-cols-1 sm:grid-cols-3 gap-4"
+        >
           {canViewMembers && (
-            <button onClick={() => router.push('/staff/members')}
-              className="flex items-center gap-3 rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-4 hover:bg-[var(--surface-secondary)] transition-colors text-left">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-green-500/10 text-green-500"><UserCheck className="h-5 w-5" /></div>
-              <div><p className="text-sm font-semibold text-[var(--foreground)]">Manage Members</p><p className="text-xs text-[var(--muted)]">View and manage member profiles</p></div>
-            </button>
+            <motion.div variants={{ hidden: { opacity: 0, x: -20 }, visible: { opacity: 1, x: 0, transition: { type: 'spring', stiffness: 200 } } }}>
+              <button onClick={() => router.push('/staff/members')}
+                className="w-full flex items-center gap-3 rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-4 hover:bg-[var(--surface-secondary)] transition-colors text-left">
+                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-green-500/10 text-green-500"><UserCheck className="h-5 w-5" /></div>
+                <div><p className="text-sm font-semibold text-[var(--foreground)]">Manage Members</p><p className="text-xs text-[var(--muted)]">View and manage member profiles</p></div>
+              </button>
+            </motion.div>
           )}
           {canViewPayments && (
-            <button onClick={() => router.push('/staff/payments')}
-              className="flex items-center gap-3 rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-4 hover:bg-[var(--surface-secondary)] transition-colors text-left">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-yellow-500/10 text-yellow-500"><CreditCard className="h-5 w-5" /></div>
-              <div><p className="text-sm font-semibold text-[var(--foreground)]">View Payments</p><p className="text-xs text-[var(--muted)]">Track payment history</p></div>
-            </button>
+            <motion.div variants={{ hidden: { opacity: 0, x: -20 }, visible: { opacity: 1, x: 0, transition: { type: 'spring', stiffness: 200 } } }}>
+              <button onClick={() => router.push('/staff/payments')}
+                className="flex w-full items-center gap-3 rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-4 hover:bg-[var(--surface-secondary)] transition-colors text-left">
+                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-yellow-500/10 text-yellow-500"><CreditCard className="h-5 w-5" /></div>
+                <div><p className="text-sm font-semibold text-[var(--foreground)]">View Payments</p><p className="text-xs text-[var(--muted)]">Track payment history</p></div>
+              </button>
+            </motion.div>
           )}
-          <button onClick={() => router.push('/staff/plans')}
-            className="flex items-center gap-3 rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-4 hover:bg-[var(--surface-secondary)] transition-colors text-left">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-500/10 text-blue-500"><ClipboardList className="h-5 w-5" /></div>
-            <div><p className="text-sm font-semibold text-[var(--foreground)]">View Plans</p><p className="text-xs text-[var(--muted)]">Browse membership plans</p></div>
-          </button>
-        </div>
+          <motion.div variants={{ hidden: { opacity: 0, x: -20 }, visible: { opacity: 1, x: 0, transition: { type: 'spring', stiffness: 200 } } }}>
+            <button onClick={() => router.push('/staff/plans')}
+              className="flex w-full items-center gap-3 rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-4 hover:bg-[var(--surface-secondary)] transition-colors text-left">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[var(--accent)]/10 text-[var(--accent)]"><ClipboardList className="h-5 w-5" /></div>
+              <div><p className="text-sm font-semibold text-[var(--foreground)]">View Plans</p><p className="text-xs text-[var(--muted)]">Browse membership plans</p></div>
+            </button>
+          </motion.div>
+        </motion.div>
       )}
 
       {/* Dashboard Charts (only if analytics permission) */}
@@ -188,12 +218,16 @@ export default function StaffDashboardClient() {
       )}
 
       {canViewAnalytics && !loadingAnalytics && (
-        <>
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ type: 'spring', stiffness: 150, damping: 20 }}
+        >
           {/* Dashboard Charts */}
           {(revenueData.length > 0 || planData.length > 0 || attendanceData.length > 0) && (
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               {revenueData.length > 0 && (
-                <ChartCard title="Monthly Revenue">
+                <ChartCard title="Monthly Revenue" delay={0.1}>
                   <ResponsiveContainer width="100%" height={280}>
                     <BarChart data={revenueData.slice(-6)}>
                       <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
@@ -209,7 +243,7 @@ export default function StaffDashboardClient() {
                 </ChartCard>
               )}
               {planData.length > 0 && (
-                <ChartCard title="Active Members by Plan">
+                <ChartCard title="Active Members by Plan" delay={0.2}>
                   <ResponsiveContainer width="100%" height={280}>
                     <PieChart>
                       <Pie data={planData} dataKey="count" nameKey="name" cx="50%" cy="50%" outerRadius={90} innerRadius={50} paddingAngle={4}>
@@ -223,7 +257,7 @@ export default function StaffDashboardClient() {
                 </ChartCard>
               )}
               {attendanceData.length > 0 && (
-                <ChartCard title="Daily Check-ins (7 days)">
+                <ChartCard title="Daily Check-ins (7 days)" delay={0.3}>
                   <ResponsiveContainer width="100%" height={280}>
                     <AreaChart data={attendanceData.slice(-7)}>
                       <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
@@ -240,7 +274,12 @@ export default function StaffDashboardClient() {
 
           {/* Recent Payments */}
           {recentPayments.length > 0 && (
-            <div className="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-5">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3, type: 'spring', stiffness: 150, damping: 20 }}
+              className="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-5"
+            >
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-sm font-semibold text-[var(--foreground)]">Recent Payments</h3>
                 <button onClick={() => router.push('/staff/payments')}
@@ -260,7 +299,7 @@ export default function StaffDashboardClient() {
                   </thead>
                   <tbody>
                     {recentPayments.map((p) => (
-                      <tr key={p.id} className="border-b border-[var(--border)]/50 last:border-0">
+                      <motion.tr key={p.id} whileHover={{ backgroundColor: 'var(--surface-secondary)' }} className="border-b border-[var(--border)]/50 last:border-0 transition-colors">
                         <td className="py-3 px-3">
                           <div className="flex items-center gap-2">
                             {p.memberImageUrl ? <img src={p.memberImageUrl} alt="" className="h-6 w-6 rounded-full object-cover" />
@@ -274,25 +313,30 @@ export default function StaffDashboardClient() {
                             <CreditCard className="h-3 w-3" /> {p.paymentMethod}</span>
                         </td>
                         <td className="py-3 px-3 text-right font-semibold text-[var(--foreground)]">₹{p.amount.toLocaleString('en-IN')}</td>
-                      </tr>
+                      </motion.tr>
                     ))}
                   </tbody>
                 </table>
               </div>
-            </div>
+            </motion.div>
           )}
-        </>
+        </motion.div>
       )}
 
       {/* No analytics permission */}
       {!canViewAnalytics && (canViewMembers || canViewPayments) && (
-        <div className="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-8 text-center">
+        <motion.div
+          initial={{ opacity: 0, y: 20, scale: 0.95 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          transition={{ type: 'spring', stiffness: 200, damping: 20 }}
+          className="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-8 text-center"
+        >
           <ShieldOff className="h-12 w-12 mx-auto text-orange-500 mb-3" />
           <h3 className="text-lg font-semibold text-[var(--foreground)]">Analytics Access Restricted</h3>
           <p className="text-sm text-[var(--muted)] mt-2 max-w-md mx-auto">
             You don&apos;t have permission to view analytics. Contact an admin to request analytics access.
           </p>
-        </div>
+        </motion.div>
       )}
 
       {/* Analytics tabs (only if permission exists) */}
@@ -320,7 +364,7 @@ export default function StaffDashboardClient() {
 
           {/* Members Tab */}
           {analyticsTab === 'members' && (
-            <div className="space-y-6">
+            <motion.div layout className="space-y-6">
               <ChartCard title="Members Overview">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="p-4 rounded-xl bg-[var(--surface-secondary)]">
@@ -348,12 +392,12 @@ export default function StaffDashboardClient() {
                   </ResponsiveContainer>
                 </ChartCard>
               )}
-            </div>
+            </motion.div>
           )}
 
           {/* Revenue Tab */}
           {analyticsTab === 'revenue' && (
-            <div className="space-y-6">
+            <motion.div layout className="space-y-6">
               <ChartCard title="Monthly Revenue (12 months)">
                 <ResponsiveContainer width="100%" height={350}>
                   <BarChart data={revenueData}>
@@ -378,12 +422,12 @@ export default function StaffDashboardClient() {
                   <p className="text-2xl font-bold text-[var(--foreground)] mt-1">₹{(stats?.thisMonthRevenue ?? 0).toLocaleString('en-IN')}</p>
                 </div>
               </div>
-            </div>
+            </motion.div>
           )}
 
           {/* Attendance Tab */}
           {analyticsTab === 'attendance' && (
-            <div className="space-y-6">
+            <motion.div layout className="space-y-6">
               <ChartCard title="Daily Check-ins (30 days)">
                 <ResponsiveContainer width="100%" height={350}>
                   <AreaChart data={attendanceData}>
@@ -405,12 +449,12 @@ export default function StaffDashboardClient() {
                   <p className="text-2xl font-bold text-[var(--foreground)] mt-1">{stats?.pendingRequests ?? 0}</p>
                 </div>
               </div>
-            </div>
+            </motion.div>
           )}
 
           {/* Plans Tab */}
           {analyticsTab === 'plans' && (
-            <div className="space-y-6">
+            <motion.div layout className="space-y-6">
               <ChartCard title="Members per Plan">
                 <ResponsiveContainer width="100%" height={350}>
                   <BarChart data={planData} layout="vertical">
@@ -436,7 +480,7 @@ export default function StaffDashboardClient() {
                 ))}
                 {planData.length === 0 && <p className="text-sm text-[var(--muted)] text-center py-4">No active plans data</p>}
               </div>
-            </div>
+            </motion.div>
           )}
         </div>
       )}

@@ -14,7 +14,9 @@ import {
   Activity,
   Wrench as WrenchIcon,
   CircleDot,
-  Power
+  Power,
+  Timer,
+  AlertTriangle
 } from 'lucide-react';
 import { JSX } from 'react/jsx-runtime';
 
@@ -24,6 +26,7 @@ interface EquipmentCardProps {
   onDelete?: (equipment: Equipment) => void;
   onToggleStatus?: (equipment: Equipment) => void;
   showActions?: boolean;
+  index?: number;
 }
 
 const statusColors: Record<string, string> = {
@@ -44,6 +47,16 @@ const statusLabels: Record<string, string> = {
   damaged: 'Damaged',
   out_of_order: 'Out of Order',
   retired: 'Retired',
+};
+
+const statusDotColors: Record<string, string> = {
+  available: 'bg-green-500',
+  'in-use': 'bg-blue-500',
+  in_use: 'bg-blue-500',
+  maintenance: 'bg-yellow-500',
+  damaged: 'bg-red-500',
+  out_of_order: 'bg-red-500',
+  retired: 'bg-gray-500',
 };
 
 // Category icons mapping
@@ -84,111 +97,128 @@ const categoryLabels: Record<string, string> = {
   other: 'Other'
 };
 
-const EquipmentCard = ({ equipment, onEdit, onDelete, onToggleStatus, showActions = true }: EquipmentCardProps) => {
+const EquipmentCard = ({ equipment, onEdit, onDelete, onToggleStatus, showActions = true, index = 0 }: EquipmentCardProps) => {
   // Fix: Use nullish coalescing to handle null values
   const category = equipment.category ?? 'other';
   const categoryInfo = categoryIcons[category] || categoryIcons.other;
   const status = equipment.status || 'available';
 
+  // Check if nextMaintenance is overdue
+  const isOverdue = equipment.nextMaintenance 
+    ? new Date(equipment.nextMaintenance) < new Date() 
+    : false;
+
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20 }}
+      initial={{ opacity: 0, y: 30 }}
       animate={{ opacity: 1, y: 0 }}
-      whileHover={{ y: -4 }}
-      className="group relative rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-6 transition-all hover:shadow-xl"
+      whileHover={{ y: -6, boxShadow: '0 20px 60px rgba(0,0,0,0.1)' }}
+      transition={{ delay: index * 0.05, type: 'spring', stiffness: 200, damping: 20 }}
+      className="relative group h-full"
     >
-      {/* Status Badge */}
-      <div className="absolute top-4 right-4">
-        <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold border ${statusColors[status] || 'bg-gray-500/10 text-gray-500 border-gray-500/20'}`}>
-          <span className={`h-1.5 w-1.5 rounded-full ${
-            status === 'available' ? 'bg-green-500' : 
-            status === 'in-use' || status === 'in_use' ? 'bg-blue-500' : 
-            status === 'maintenance' ? 'bg-yellow-500' : 
-            status === 'damaged' || status === 'out_of_order' ? 'bg-red-500' : 
-            'bg-gray-500'
-          }`} />
-          {statusLabels[status] || status}
-        </span>
-      </div>
-
-      {/* Category Icon with Label */}
-      <div className="flex items-center gap-3 mb-4">
-        <div className={`flex h-14 w-14 items-center justify-center rounded-xl ${categoryInfo.bgColor} transition-colors`}>
-          {categoryInfo.icon}
-        </div>
-        <div>
-          <span className="text-xs font-medium text-[var(--muted)] uppercase tracking-wider">
-            {categoryLabels[category] || 'Other'}
+      <div className="relative rounded-2xl border border-[var(--border)]/50 bg-[var(--surface)]/80 backdrop-blur-xl overflow-hidden h-full flex flex-col">
+        {/* Status Badge */}
+        <div className="absolute top-4 right-4 z-10">
+          <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold border ${statusColors[status] || 'bg-gray-500/10 text-gray-500 border-gray-500/20'}`}>
+            <span className="relative flex h-2 w-2">
+              <span className={`animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 ${statusDotColors[status] || 'bg-gray-500'}`} />
+              <span className={`relative inline-flex rounded-full h-2 w-2 ${statusDotColors[status] || 'bg-gray-500'}`} />
+            </span>
+            {statusLabels[status] || status}
           </span>
         </div>
-      </div>
 
-      {/* Content */}
-      <h3 className="text-lg font-bold text-[var(--foreground)] mb-1">{equipment.name}</h3>
-      <p className="text-sm text-[var(--muted)] mb-3 line-clamp-2">{equipment.description || 'No description'}</p>
+        {/* Category Icon with Gradient Container */}
+        <div className="p-6 flex-1 flex flex-col">
+          <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-[var(--accent)]/20 to-[var(--accent)]/5 text-[var(--accent)] shadow-lg shadow-[var(--accent)]/10 mb-4">
+            {categoryInfo.icon}
+          </div>
 
-      {/* Details */}
-      <div className="space-y-2 text-sm">
-        <div className="flex items-center gap-2 text-[var(--muted)]">
-          <Package className="h-3.5 w-3.5" />
-          <span>Quantity: <span className="text-[var(--foreground)] font-medium">{equipment.quantity}</span></span>
+          {/* Category Label */}
+          <span className="text-xs font-medium text-[var(--muted)] uppercase tracking-wider mb-2">
+            {categoryLabels[category] || 'Other'}
+          </span>
+
+          {/* Content */}
+          <h3 className="text-lg font-bold text-[var(--foreground)] mb-1">{equipment.name}</h3>
+          <p className="text-sm text-[var(--muted)] mb-4 line-clamp-2">{equipment.description || 'No description'}</p>
+
+          {/* Details */}
+          <div className="space-y-2 text-sm flex-1">
+            <div className="flex items-center gap-2 text-[var(--muted)]">
+              <Package className="h-3.5 w-3.5 shrink-0" />
+              <span>Quantity: <span className="text-[var(--foreground)] font-medium">{equipment.quantity}</span></span>
+            </div>
+            {equipment.location && (
+              <div className="flex items-center gap-2 text-[var(--muted)]">
+                <MapPin className="h-3.5 w-3.5 shrink-0" />
+                <span>{equipment.location}</span>
+              </div>
+            )}
+            {equipment.lastMaintenance && (
+              <div className="flex items-center gap-2 text-[var(--muted)]">
+                <Wrench className="h-3.5 w-3.5 shrink-0" />
+                <span>Last: {new Date(equipment.lastMaintenance).toLocaleDateString()}</span>
+              </div>
+            )}
+            {equipment.nextMaintenance && (
+              <div className={`flex items-center gap-2 ${isOverdue ? 'text-red-500' : 'text-[var(--muted)]'}`}>
+                <Calendar className="h-3.5 w-3.5 shrink-0" />
+                <span className={isOverdue ? 'font-semibold' : ''}>
+                  Next: {new Date(equipment.nextMaintenance).toLocaleDateString()}
+                </span>
+                {isOverdue && (
+                  <span className="flex items-center gap-1 text-[10px] font-bold bg-red-500/10 text-red-500 px-2 py-0.5 rounded-full">
+                    <AlertTriangle className="h-3 w-3" />
+                    Overdue
+                  </span>
+                )}
+              </div>
+            )}
+          </div>
         </div>
-        {equipment.location && (
-          <div className="flex items-center gap-2 text-[var(--muted)]">
-            <MapPin className="h-3.5 w-3.5" />
-            <span>{equipment.location}</span>
-          </div>
-        )}
-        {equipment.lastMaintenance && (
-          <div className="flex items-center gap-2 text-[var(--muted)]">
-            <Wrench className="h-3.5 w-3.5" />
-            <span>Last: {new Date(equipment.lastMaintenance).toLocaleDateString()}</span>
-          </div>
-        )}
-        {equipment.nextMaintenance && (
-          <div className="flex items-center gap-2 text-[var(--muted)]">
-            <Calendar className="h-3.5 w-3.5" />
-            <span>Next: {new Date(equipment.nextMaintenance).toLocaleDateString()}</span>
+
+        {/* Action Buttons - Compact Icon Row */}
+        {showActions && (onEdit || onDelete || onToggleStatus) && (
+          <div className="px-6 py-3 border-t border-[var(--border)]/50 bg-[var(--surface-secondary)]/30 mt-auto">
+            <div className="flex items-center justify-center gap-1">
+              <motion.button
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.9 }}
+                onClick={() => onEdit?.(equipment)}
+                className="group relative flex h-9 w-9 items-center justify-center rounded-lg hover:bg-[var(--accent)]/10 text-[var(--muted)] hover:text-[var(--accent)] transition-all"
+                title="Edit equipment"
+              >
+                <Edit className="h-4 w-4" />
+              </motion.button>
+              <div className="w-px h-6 bg-[var(--border)]/30" />
+              <motion.button
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.9 }}
+                onClick={() => onToggleStatus?.(equipment)}
+                className={`group relative flex h-9 w-9 items-center justify-center rounded-lg transition-all ${
+                  status === 'available'
+                    ? 'text-[var(--muted)] hover:bg-yellow-500/10 hover:text-yellow-500'
+                    : 'text-[var(--muted)] hover:bg-green-500/10 hover:text-green-500'
+                }`}
+                title={status === 'available' ? 'Mark as maintenance' : 'Mark as available'}
+              >
+                <Power className="h-4 w-4" />
+              </motion.button>
+              <div className="w-px h-6 bg-[var(--border)]/30" />
+              <motion.button
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.9 }}
+                onClick={() => onDelete?.(equipment)}
+                className="group relative flex h-9 w-9 items-center justify-center rounded-lg hover:bg-[var(--danger)]/10 text-[var(--muted)] hover:text-[var(--danger)] transition-all"
+                title="Delete equipment"
+              >
+                <Trash2 className="h-4 w-4" />
+              </motion.button>
+            </div>
           </div>
         )}
       </div>
-
-      {/* Actions */}
-      {showActions && (onEdit || onDelete || onToggleStatus) && (
-        <div className="flex items-center gap-2 mt-4 pt-4 border-t border-[var(--border)]">
-          {onToggleStatus && (
-            <button
-              onClick={() => onToggleStatus(equipment)}
-              className={`flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-xl text-sm font-medium transition-colors ${
-                status === 'available' 
-                  ? 'bg-yellow-500/10 text-yellow-500 hover:bg-yellow-500/20' 
-                  : 'bg-green-500/10 text-green-500 hover:bg-green-500/20'
-              }`}
-            >
-              <Power className="h-3.5 w-3.5" />
-              {status === 'available' ? 'Maintenance' : 'Available'}
-            </button>
-          )}
-          {onEdit && (
-            <button
-              onClick={() => onEdit(equipment)}
-              className="flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-xl bg-[var(--accent)]/10 text-[var(--accent)] hover:bg-[var(--accent)]/20 transition-colors text-sm font-medium"
-            >
-              <Edit className="h-3.5 w-3.5" />
-              Edit
-            </button>
-          )}
-          {onDelete && (
-            <button
-              onClick={() => onDelete(equipment)}
-              className="flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-xl bg-red-500/10 text-red-500 hover:bg-red-500/20 transition-colors text-sm font-medium"
-            >
-              <Trash2 className="h-3.5 w-3.5" />
-              Delete
-            </button>
-          )}
-        </div>
-      )}
     </motion.div>
   );
 };

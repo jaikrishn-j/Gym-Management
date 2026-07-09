@@ -408,7 +408,7 @@ const MembersClient = ({
             return (
               <g key={r.id}>
                 <rect x={x} y={y} width={8} height={barH} rx={2}
-                  fill={r.isPresent ? '#22c55e' : '#6b7280'} opacity={0.7} />
+                  fill={r.isPresent ? 'var(--success)' : 'var(--muted)'} opacity={0.7} />
                 <text x={x + 4} y={104} fontSize="6" textAnchor="middle" fill="var(--muted)">
                   {new Date(r.date).getDate()}
                 </text>
@@ -422,69 +422,85 @@ const MembersClient = ({
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-black text-[var(--foreground)]">Gym Members</h1>
-          <p className="text-sm text-[var(--muted)] mt-1">View and manage all gym members</p>
-        </div>
-        <div className="flex items-center gap-3">
-          <div className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold border ${
-            isOnline
-              ? 'bg-green-500/10 text-green-500 border-green-500/20'
-              : 'bg-yellow-500/10 text-yellow-500 border-yellow-500/20'
-          }`}>
-            {isOnline ? <Wifi className="h-3.5 w-3.5" /> : <WifiOff className="h-3.5 w-3.5" />}
-            {isOnline ? 'Online' : 'Offline'}
-          </div>
-
-          {pendingSyncs > 0 && (
-            <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-orange-500/10 text-orange-500 border border-orange-500/20 text-xs font-semibold">
-              <Clock className="h-3.5 w-3.5" />
-              {pendingSyncs} pending sync{pendingSyncs > 1 ? 's' : ''}
+      {/* Hero Header */}
+      <motion.div
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ type: 'spring', stiffness: 200, damping: 20 }}
+        className="bg-gradient-to-r from-[var(--accent)]/10 via-[var(--accent)]/5 to-transparent rounded-2xl border border-[var(--border)] p-6"
+      >
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-[var(--accent)]/20 to-[var(--accent)]/5 text-[var(--accent)] shadow-lg shadow-[var(--accent)]/10">
+              <Users className="h-7 w-7" />
             </div>
-          )}
+            <div>
+              <h1 className="text-2xl font-black text-[var(--foreground)]">Gym Members</h1>
+              <p className="text-sm text-[var(--muted)]">View and manage all gym members</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-3">
+            <div className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold border ${
+              isOnline
+                ? 'bg-[var(--success)]/10 text-[var(--success)] border-[var(--success)]/20'
+                : 'bg-[var(--warning)]/10 text-[var(--warning)] border-[var(--warning)]/20'
+            }`}>
+              {isOnline ? <Wifi className="h-3.5 w-3.5" /> : <WifiOff className="h-3.5 w-3.5" />}
+              {isOnline ? 'Online' : 'Offline'}
+            </div>
 
-          <div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-blue-500/10 text-blue-500 font-semibold text-sm">
-            <Users className="h-4 w-4" />
-            {members.length} Members
+            {pendingSyncs > 0 && (
+              <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-[var(--warning)]/10 text-[var(--warning)] border border-[var(--warning)]/20 text-xs font-semibold">
+                <Clock className="h-3.5 w-3.5" />
+                {pendingSyncs} pending sync{pendingSyncs > 1 ? 's' : ''}
+              </div>
+            )}
           </div>
         </div>
-      </div>
+      </motion.div>
 
       {/* Search */}
-      <div className="relative">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--muted)]" />
-        <input type="text" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)}
-          placeholder="Search members by name or email..."
-          className="w-full h-12 pl-10 pr-4 rounded-xl border border-[var(--field-border)] bg-[var(--field-background)] text-[var(--foreground)] placeholder:text-[var(--muted)] font-medium outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/15 transition-all" />
-      </div>
+      <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.1 }}
+        className="backdrop-blur-xl bg-[var(--surface)]/80 rounded-2xl border border-[var(--border)]/50 p-4"
+      >
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--muted)]" />
+          <input type="text" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)}
+            placeholder="Search members by name or email..."
+            className="w-full h-11 pl-10 pr-4 rounded-xl border border-[var(--field-border)] bg-[var(--field-background)] text-[var(--foreground)] placeholder:text-[var(--muted)] font-medium outline-none focus:border-[var(--accent)] focus:ring-4 focus:ring-[var(--accent)]/15 transition-all" />
+        </div>
+      </motion.div>
 
-      {/* Error */}
+      {/* Error Banner */}
       <AnimatePresence>
         {error && (
           <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}
-            className="flex items-center gap-3 rounded-2xl bg-red-500/10 border border-red-500/20 p-4">
-            <AlertCircle className="h-5 w-5 text-red-500 shrink-0" />
-            <p className="text-sm text-red-500 font-medium">{error}</p>
-            <button onClick={() => setError('')} className="ml-auto">
-              <X className="h-4 w-4 text-red-500" />
-            </button>
+            className="flex items-center gap-3 rounded-2xl bg-[var(--danger)]/10 border border-[var(--danger)]/20 p-4">
+            <AlertCircle className="h-5 w-5 text-[var(--danger)] shrink-0" />
+            <p className="text-sm text-[var(--danger)] font-medium flex-1">{error}</p>
+            <motion.button whileHover={{ scale: 1.1, rotate: 90 }} onClick={() => setError('')} className="ml-auto shrink-0">
+              <X className="h-4 w-4 text-[var(--danger)]" />
+            </motion.button>
           </motion.div>
         )}
       </AnimatePresence>
 
       {/* Members Table */}
       {filteredMembers.length === 0 ? (
-        <div className="text-center py-20">
+        <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }}
+          transition={{ type: 'spring', stiffness: 200, damping: 20 }}
+          className="text-center py-20">
           <Users className="h-12 w-12 text-[var(--muted)] mx-auto mb-3" />
           <p className="text-[var(--muted)] text-lg">{searchTerm ? 'No members found' : 'No members yet'}</p>
-        </div>
+        </motion.div>
       ) : (
-        <div className="overflow-x-auto rounded-2xl border border-[var(--border)] bg-[var(--surface)]">
+        <div className="overflow-x-auto backdrop-blur-xl bg-[var(--surface)]/80 border border-[var(--border)]/50 rounded-2xl">
           <table className="w-full">
             <thead>
-              <tr className="border-b border-[var(--border)] bg-[var(--surface-secondary)]">
+              <tr className="border-b border-[var(--border)]/50 bg-[var(--surface-secondary)]/80">
                 <th className="px-4 py-3 text-left text-xs font-semibold text-[var(--muted)] uppercase">Member</th>
                 <th className="px-4 py-3 text-left text-xs font-semibold text-[var(--muted)] uppercase hidden lg:table-cell">Plan</th>
                 <th className="px-4 py-3 text-left text-xs font-semibold text-[var(--muted)] uppercase hidden md:table-cell">Joined</th>
@@ -493,8 +509,13 @@ const MembersClient = ({
               </tr>
             </thead>
             <tbody className="divide-y divide-[var(--border)]">
-              {filteredMembers.map((member) => (
-                <motion.tr key={member.id} initial={{ opacity: 0 }} animate={{ opacity: 1 }}
+              {filteredMembers.map((member, index) => (
+                <motion.tr
+                  key={member.id}
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: index * 0.03, type: 'spring', stiffness: 200, damping: 25 }}
+                  whileHover={{ backgroundColor: 'var(--surface-secondary)' }}
                   className="hover:bg-[var(--surface-secondary)]/50 transition-colors">
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-3">
@@ -502,7 +523,7 @@ const MembersClient = ({
                         <img src={member.imageUrl} alt={member.firstName}
                           className="h-9 w-9 rounded-full object-cover border border-[var(--border)]" />
                       ) : (
-                        <div className="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-blue-500/20 to-blue-500/10 text-blue-500 font-semibold text-xs">
+                        <div className="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-[var(--accent)]/20 to-[var(--accent)]/5 text-[var(--accent)] font-semibold text-xs">
                           {getInitials(member.firstName, member.lastName)}
                         </div>
                       )}
@@ -524,16 +545,16 @@ const MembersClient = ({
                   </td>
                   <td className="px-4 py-3">
                     <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium ${
-                      member.status === 'active' ? 'bg-green-500/10 text-green-500' : 'bg-gray-500/10 text-gray-500'
+                      member.status === 'active' ? 'bg-[var(--success)]/10 text-[var(--success)]' : 'bg-[var(--muted)]/10 text-[var(--muted)]'
                     }`}>
-                      <span className={`h-1.5 w-1.5 rounded-full ${member.status === 'active' ? 'bg-green-500' : 'bg-gray-500'}`} />
+                      <span className={`h-1.5 w-1.5 rounded-full ${member.status === 'active' ? 'bg-[var(--success)]' : 'bg-[var(--muted)]'}`} />
                       {member.status === 'active' ? 'Active' : 'Inactive'}
                     </span>
                   </td>
                   <td className="px-4 py-3 text-right">
                     {canRead && (
                       <button onClick={() => handleViewMember(member)}
-                        className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-blue-500 text-white hover:bg-blue-500/90 font-medium text-xs transition-colors">
+                        className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-[var(--accent)] text-white hover:bg-[var(--accent)]/90 font-medium text-xs transition-all shadow-lg shadow-[var(--accent)]/20">
                         <Eye className="h-3.5 w-3.5" />
                         View
                       </button>
@@ -555,9 +576,10 @@ const MembersClient = ({
               className="absolute inset-0 bg-black/50 backdrop-blur-sm" />
             <motion.div initial={{ opacity: 0, y: 100 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 100 }}
               transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-              className="relative w-full sm:max-w-2xl max-h-[90vh] overflow-y-auto rounded-t-3xl sm:rounded-3xl border border-[var(--border)] bg-[var(--surface)] p-6 shadow-2xl z-10">
+              className="relative w-full sm:max-w-2xl max-h-[90vh] overflow-y-auto rounded-t-3xl sm:rounded-3xl border border-[var(--border)]/50 bg-[var(--surface)]/95 backdrop-blur-xl p-6 shadow-2xl z-10">
 
-              <div className="w-10 h-1 rounded-full bg-[var(--border)] mx-auto mb-6 sm:hidden" />
+              {/* Decorative accent bar */}
+              <div className="w-16 h-1 rounded-full bg-gradient-to-r from-[var(--accent)] to-[var(--accent)]/50 mx-auto mb-6 sm:hidden" />
 
               {/* Header */}
               <div className="flex items-center justify-between mb-6">
@@ -566,7 +588,7 @@ const MembersClient = ({
                     <img src={selectedMember.imageUrl} alt={selectedMember.firstName}
                       className="h-10 w-10 rounded-full object-cover border border-[var(--border)]" />
                   ) : (
-                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-blue-500/20 to-blue-500/10 text-blue-500 font-semibold text-sm">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-[var(--accent)]/20 to-[var(--accent)]/5 text-[var(--accent)] font-semibold text-sm">
                       {getInitials(selectedMember.firstName, selectedMember.lastName)}
                     </div>
                   )}
@@ -577,10 +599,10 @@ const MembersClient = ({
                     <p className="text-sm text-[var(--muted)]">{selectedMember.email}</p>
                   </div>
                 </div>
-                <button onClick={() => { setShowDetailsModal(false); setSelectedMember(null); }}
+                <motion.button whileHover={{ scale: 1.1, rotate: 90 }} onClick={() => { setShowDetailsModal(false); setSelectedMember(null); }}
                   className="h-8 w-8 flex items-center justify-center rounded-lg hover:bg-[var(--surface-secondary)]">
                   <X className="h-5 w-5 text-[var(--muted)]" />
-                </button>
+                </motion.button>
               </div>
 
               {/* Tabs */}
@@ -588,7 +610,7 @@ const MembersClient = ({
                 <button onClick={() => setActiveTab('attendance')}
                   className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm font-semibold transition-all ${
                     activeTab === 'attendance'
-                      ? 'bg-blue-500 text-white shadow-lg'
+                      ? 'bg-[var(--accent)] text-white shadow-lg shadow-[var(--accent)]/20'
                       : 'text-[var(--muted)] hover:text-[var(--foreground)]'
                   }`}>
                   <Footprints className="h-4 w-4" /> Attendance
@@ -596,7 +618,7 @@ const MembersClient = ({
                 <button onClick={() => setActiveTab('plans')}
                   className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm font-semibold transition-all ${
                     activeTab === 'plans'
-                      ? 'bg-blue-500 text-white shadow-lg'
+                      ? 'bg-[var(--accent)] text-white shadow-lg shadow-[var(--accent)]/20'
                       : 'text-[var(--muted)] hover:text-[var(--foreground)]'
                   }`}>
                   <CreditCard className="h-4 w-4" /> Payments & Plans
@@ -605,16 +627,17 @@ const MembersClient = ({
 
               {/* Tab 1: Attendance */}
               {activeTab === 'attendance' && (
-                <div className="space-y-4">
+                <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
+                  className="space-y-4">
                   <div className="flex items-center justify-between">
                     <h3 className="text-sm font-bold text-[var(--foreground)] flex items-center gap-2">
-                      <Activity className="h-4 w-4 text-green-500" /> Login Activity
+                      <Activity className="h-4 w-4 text-[var(--success)]" /> Login Activity
                       <span className="text-xs text-[var(--muted)] font-normal">({attendanceHistory.length} records)</span>
                     </h3>
                     <div className="flex items-center gap-2">
                       {canUpdate && markAttendance && (
                         <button onClick={() => setShowMarkAttendance(!showMarkAttendance)}
-                          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-blue-500 text-white text-xs font-semibold">
+                          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[var(--accent)] text-white text-xs font-semibold shadow-lg shadow-[var(--accent)]/20">
                           <Plus className="h-3.5 w-3.5" /> Mark Attendance
                         </button>
                       )}
@@ -636,27 +659,27 @@ const MembersClient = ({
                             <label className="block text-xs font-semibold text-[var(--muted)] uppercase mb-1">Date</label>
                             <input type="date" value={attendanceForm.date}
                               onChange={(e) => setAttendanceForm(prev => ({ ...prev, date: e.target.value }))}
-                              className="w-full h-10 px-3 rounded-xl border border-[var(--field-border)] bg-[var(--field-background)] text-sm outline-none focus:border-blue-500" />
+                              className="w-full h-10 px-3 rounded-xl border border-[var(--field-border)] bg-[var(--field-background)] text-sm outline-none focus:border-[var(--accent)] focus:ring-4 focus:ring-[var(--accent)]/15" />
                           </div>
                           <div>
                             <label className="block text-xs font-semibold text-[var(--muted)] uppercase mb-1">Time In</label>
                             <input type="time" value={attendanceForm.timeIn}
                               onChange={(e) => setAttendanceForm(prev => ({ ...prev, timeIn: e.target.value }))}
-                              className="w-full h-10 px-3 rounded-xl border border-[var(--field-border)] bg-[var(--field-background)] text-sm outline-none focus:border-blue-500" />
+                              className="w-full h-10 px-3 rounded-xl border border-[var(--field-border)] bg-[var(--field-background)] text-sm outline-none focus:border-[var(--accent)] focus:ring-4 focus:ring-[var(--accent)]/15" />
                           </div>
                           <div>
                             <label className="block text-xs font-semibold text-[var(--muted)] uppercase mb-1">Weight In</label>
                             <input type="number" step="0.1" value={attendanceForm.weightIn}
                               onChange={(e) => setAttendanceForm(prev => ({ ...prev, weightIn: e.target.value }))}
                               placeholder="kg"
-                              className="w-full h-10 px-3 rounded-xl border border-[var(--field-border)] bg-[var(--field-background)] text-sm outline-none focus:border-blue-500" />
+                              className="w-full h-10 px-3 rounded-xl border border-[var(--field-border)] bg-[var(--field-background)] text-sm outline-none focus:border-[var(--accent)] focus:ring-4 focus:ring-[var(--accent)]/15" />
                           </div>
                           <div className="col-span-2">
                             <label className="block text-xs font-semibold text-[var(--muted)] uppercase mb-1">Weight Out</label>
                             <input type="number" step="0.1" value={attendanceForm.weightOut}
                               onChange={(e) => setAttendanceForm(prev => ({ ...prev, weightOut: e.target.value }))}
                               placeholder="kg"
-                              className="w-full h-10 px-3 rounded-xl border border-[var(--field-border)] bg-[var(--field-background)] text-sm outline-none focus:border-blue-500" />
+                              className="w-full h-10 px-3 rounded-xl border border-[var(--field-border)] bg-[var(--field-background)] text-sm outline-none focus:border-[var(--accent)] focus:ring-4 focus:ring-[var(--accent)]/15" />
                           </div>
                         </div>
                         <div className="flex gap-2 mt-3">
@@ -664,7 +687,7 @@ const MembersClient = ({
                             className="flex-1 h-10 rounded-xl border border-[var(--border)] text-xs font-semibold">Cancel</button>
                           <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}
                             onClick={handleMarkAttendance} disabled={isMarkingAttendance}
-                            className="flex-1 h-10 rounded-xl bg-green-500 text-white text-xs font-semibold disabled:opacity-50 flex items-center justify-center gap-1.5">
+                            className="flex-1 h-10 rounded-xl bg-[var(--success)] text-white text-xs font-semibold disabled:opacity-50 flex items-center justify-center gap-1.5 shadow-lg shadow-[var(--success)]/20">
                             {isMarkingAttendance ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <CheckCircle2 className="h-3.5 w-3.5" />}
                             Mark Present
                           </motion.button>
@@ -675,20 +698,23 @@ const MembersClient = ({
 
                   {/* Attendance Content */}
                   {attendanceHistory.length === 0 ? (
-                    <div className="text-center py-10 rounded-2xl border border-dashed border-[var(--border)]">
+                    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.2 }}
+                      className="text-center py-10 rounded-2xl border border-dashed border-[var(--border)]">
                       <Footprints className="h-8 w-8 text-[var(--muted)] mx-auto mb-2 opacity-30" />
                       <p className="text-sm text-[var(--muted)]">No attendance records found</p>
-                    </div>
+                    </motion.div>
                   ) : showAttendanceGraph ? (
-                    <div className="rounded-2xl border border-[var(--border)] p-4">
+                    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.15 }}
+                      className="rounded-2xl border border-[var(--border)] p-4">
                       <AttendanceChart records={attendanceHistory.slice(0, 30)} />
                       <div className="flex items-center justify-center gap-4 mt-3 text-[10px] text-[var(--muted)]">
-                        <span className="flex items-center gap-1"><span className="h-2 w-2 rounded-full bg-green-500" /> Present</span>
-                        <span className="flex items-center gap-1"><span className="h-2 w-2 rounded-full bg-gray-500" /> Absent</span>
+                        <span className="flex items-center gap-1"><span className="h-2 w-2 rounded-full bg-[var(--success)]" /> Present</span>
+                        <span className="flex items-center gap-1"><span className="h-2 w-2 rounded-full bg-[var(--muted)]" /> Absent</span>
                       </div>
-                    </div>
+                    </motion.div>
                   ) : (
-                    <div className="overflow-x-auto rounded-2xl border border-[var(--border)]">
+                    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.15 }}
+                      className="overflow-x-auto rounded-2xl border border-[var(--border)]">
                       <table className="w-full">
                         <thead>
                           <tr className="border-b border-[var(--border)] bg-[var(--surface-secondary)]">
@@ -710,9 +736,9 @@ const MembersClient = ({
                               <td className="px-3 py-2 text-xs text-[var(--muted)]">{record.weightOut ?? '--'}</td>
                               <td className="px-3 py-2">
                                 <span className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[10px] font-medium ${
-                                  record.isPresent ? 'bg-green-500/10 text-green-500' : 'bg-gray-500/10 text-gray-500'
+                                  record.isPresent ? 'bg-[var(--success)]/10 text-[var(--success)]' : 'bg-[var(--muted)]/10 text-[var(--muted)]'
                                 }`}>
-                                  <span className={`h-1.5 w-1.5 rounded-full ${record.isPresent ? 'bg-green-500' : 'bg-gray-500'}`} />
+                                  <span className={`h-1.5 w-1.5 rounded-full ${record.isPresent ? 'bg-[var(--success)]' : 'bg-[var(--muted)]'}`} />
                                   {record.isPresent ? 'Present' : 'Absent'}
                                 </span>
                               </td>
@@ -720,28 +746,30 @@ const MembersClient = ({
                           ))}
                         </tbody>
                       </table>
-                    </div>
+                    </motion.div>
                   )}
-                </div>
+                </motion.div>
               )}
 
               {/* Tab 2: Payments & Plans */}
               {activeTab === 'plans' && (
-                <div className="space-y-4">
+                <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
+                  className="space-y-4">
                   {/* Active Plan */}
                   {getActivePlan() && (
-                    <div className="p-4 rounded-2xl bg-green-500/10 border border-green-500/20">
-                      <p className="text-xs font-semibold text-green-500 uppercase mb-1">Current Plan</p>
+                    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.15 }}
+                      className="p-4 rounded-2xl bg-[var(--success)]/10 border border-[var(--success)]/20">
+                      <p className="text-xs font-semibold text-[var(--success)] uppercase mb-1">Current Plan</p>
                       <p className="font-bold text-[var(--foreground)]">{getActivePlan()?.plan?.name || 'Active Plan'}</p>
                       <p className="text-xs text-[var(--muted)]">
                         Ends: {formatDate(getActivePlan()?.endDate || '')}
                       </p>
-                    </div>
+                    </motion.div>
                   )}
 
                   {/* Recent Payments */}
                   {recentPayments.length > 0 && (
-                    <div>
+                    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.2 }}>
                       <h3 className="text-xs font-semibold text-[var(--muted)] uppercase mb-2 flex items-center gap-1">
                         <History className="h-3 w-3" /> Recent Payments
                       </h3>
@@ -759,18 +787,18 @@ const MembersClient = ({
                           </div>
                         ))}
                       </div>
-                    </div>
+                    </motion.div>
                   )}
 
                   {/* Select Plan */}
                   {canUpdate && (
-                    <>
+                    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.25 }}>
                       <h3 className="text-xs font-semibold text-[var(--muted)] uppercase mb-2">Assign a Plan</h3>
                       <div className="space-y-2">
                         {availablePlans.filter(p => p.isActive).map((plan) => (
                           <motion.button key={plan.id} whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.99 }}
                             onClick={() => handleSelectPlan(plan)}
-                            className="w-full text-left p-3.5 rounded-xl border border-[var(--border)] hover:border-blue-500 bg-[var(--field-background)] transition-all">
+                            className="w-full text-left p-3.5 rounded-xl border border-[var(--border)] hover:border-[var(--accent)] bg-[var(--field-background)] transition-all shadow-sm hover:shadow-md hover:shadow-[var(--accent)]/5">
                             <div className="flex items-center justify-between">
                               <div>
                                 <p className="font-semibold text-sm text-[var(--foreground)]">{plan.name}</p>
@@ -791,9 +819,9 @@ const MembersClient = ({
                           </motion.button>
                         ))}
                       </div>
-                    </>
+                    </motion.div>
                   )}
-                </div>
+                </motion.div>
               )}
             </motion.div>
           </div>
@@ -808,19 +836,20 @@ const MembersClient = ({
               onClick={() => setShowPaymentModal(false)}
               className="absolute inset-0 bg-black/50 backdrop-blur-sm" />
             <motion.div initial={{ opacity: 0, y: 100 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 100 }}
-              className="relative w-full sm:max-w-sm rounded-t-3xl sm:rounded-3xl border border-[var(--border)] bg-[var(--surface)] p-6 shadow-2xl z-10">
+              className="relative w-full sm:max-w-sm rounded-t-3xl sm:rounded-3xl border border-[var(--border)]/50 bg-[var(--surface)]/95 backdrop-blur-xl p-6 shadow-2xl z-10">
 
-              <div className="w-10 h-1 rounded-full bg-[var(--border)] mx-auto mb-6 sm:hidden" />
+              {/* Decorative accent bar */}
+              <div className="w-12 h-1 rounded-full bg-gradient-to-r from-[var(--accent)] to-[var(--accent)]/50 mx-auto mb-6 sm:hidden" />
 
               <div className="flex items-center justify-between mb-6">
                 <div>
                   <h2 className="text-lg font-bold text-[var(--foreground)]">Record Payment</h2>
                   <p className="text-xs text-[var(--muted)]">{selectedPlan.name} • {selectedMember.firstName}</p>
                 </div>
-                <button onClick={() => setShowPaymentModal(false)}
+                <motion.button whileHover={{ scale: 1.1, rotate: 90 }} onClick={() => setShowPaymentModal(false)}
                   className="h-8 w-8 flex items-center justify-center rounded-lg hover:bg-[var(--surface-secondary)]">
                   <X className="h-5 w-5 text-[var(--muted)]" />
-                </button>
+                </motion.button>
               </div>
 
               <div className="space-y-4">
@@ -828,14 +857,14 @@ const MembersClient = ({
                   <label className="block text-xs font-semibold text-[var(--muted)] uppercase mb-1.5">Amount (₹)</label>
                   <input type="number" value={paymentForm.amount}
                     onChange={(e) => setPaymentForm(prev => ({ ...prev, amount: e.target.value }))}
-                    className="w-full h-12 px-4 rounded-xl border border-[var(--field-border)] bg-[var(--field-background)] text-[var(--foreground)] font-bold text-lg outline-none focus:border-blue-500" />
+                    className="w-full h-12 px-4 rounded-xl border border-[var(--field-border)] bg-[var(--field-background)] text-[var(--foreground)] font-bold text-lg outline-none focus:border-[var(--accent)] focus:ring-4 focus:ring-[var(--accent)]/15" />
                 </div>
 
                 <div>
                   <label className="block text-xs font-semibold text-[var(--muted)] uppercase mb-1.5">Days to Add</label>
                   <input type="number" value={paymentForm.daysAdded}
                     onChange={(e) => setPaymentForm(prev => ({ ...prev, daysAdded: e.target.value }))}
-                    className="w-full h-12 px-4 rounded-xl border border-[var(--field-border)] bg-[var(--field-background)] text-[var(--foreground)] font-bold text-lg outline-none focus:border-blue-500" />
+                    className="w-full h-12 px-4 rounded-xl border border-[var(--field-border)] bg-[var(--field-background)] text-[var(--foreground)] font-bold text-lg outline-none focus:border-[var(--accent)] focus:ring-4 focus:ring-[var(--accent)]/15" />
                 </div>
 
                 <div>
@@ -845,7 +874,7 @@ const MembersClient = ({
                       <button key={method} onClick={() => setPaymentForm(prev => ({ ...prev, paymentMethod: method }))}
                         className={`flex items-center justify-center gap-1.5 py-2.5 rounded-xl text-xs font-semibold transition-all ${
                           paymentForm.paymentMethod === method
-                            ? 'bg-blue-500 text-white'
+                            ? 'bg-[var(--accent)] text-white shadow-lg shadow-[var(--accent)]/20'
                             : 'bg-[var(--field-background)] text-[var(--muted)] border border-[var(--border)]'
                         }`}>
                         {getPaymentIcon(method)}
@@ -860,13 +889,13 @@ const MembersClient = ({
                   <input type="text" value={paymentForm.notes}
                     onChange={(e) => setPaymentForm(prev => ({ ...prev, notes: e.target.value }))}
                     placeholder="Any notes..."
-                    className="w-full h-12 px-4 rounded-xl border border-[var(--field-border)] bg-[var(--field-background)] text-[var(--foreground)] text-sm outline-none focus:border-blue-500" />
+                    className="w-full h-12 px-4 rounded-xl border border-[var(--field-border)] bg-[var(--field-background)] text-[var(--foreground)] text-sm outline-none focus:border-[var(--accent)] focus:ring-4 focus:ring-[var(--accent)]/15" />
                 </div>
 
                 {!isOnline && (
-                  <div className="flex items-center gap-2 p-3 rounded-xl bg-yellow-500/10 border border-yellow-500/20">
-                    <WifiOff className="h-4 w-4 text-yellow-500 shrink-0" />
-                    <p className="text-xs text-yellow-500 font-medium">
+                  <div className="flex items-center gap-2 p-3 rounded-xl bg-[var(--warning)]/10 border border-[var(--warning)]/20">
+                    <WifiOff className="h-4 w-4 text-[var(--warning)] shrink-0" />
+                    <p className="text-xs text-[var(--warning)] font-medium">
                       Payment will be saved offline and synced when connected.
                     </p>
                   </div>
@@ -874,7 +903,7 @@ const MembersClient = ({
 
                 <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}
                   onClick={handleSavePayment} disabled={isSaving || !paymentForm.amount || !paymentForm.daysAdded}
-                  className="w-full h-12 rounded-xl bg-blue-500 text-white font-bold shadow-lg shadow-blue-500/20 disabled:opacity-50 flex items-center justify-center gap-2">
+                  className="w-full h-12 rounded-xl bg-gradient-to-r from-[var(--accent)] to-[var(--accent)]/90 text-white font-bold shadow-lg shadow-[var(--accent)]/20 disabled:opacity-50 flex items-center justify-center gap-2">
                   {isSaving ? <Loader2 className="h-4 w-4 animate-spin" /> : (
                     <>{isOnline ? <CheckCircle2 className="h-4 w-4" /> : <WifiOff className="h-4 w-4" />}
                     {isOnline ? 'Save Payment' : 'Save Offline'}
