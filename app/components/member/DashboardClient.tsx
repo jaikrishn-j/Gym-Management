@@ -6,7 +6,7 @@ import {
   Crown, Zap, Star, CheckCircle2, AlertCircle, Loader2, IndianRupee, Timer, X,
   CreditCard, ArrowRight, RefreshCw, TrendingUp, TrendingDown, BarChart3,
   Calendar, ChevronLeft, ChevronRight, Plus, Scale, Activity, Target,
-  Footprints, Maximize2, Minimize2, Bell, Clock, Send, ShieldCheck
+  Footprints, Maximize2, Minimize2, Bell, Clock, Send, ShieldCheck, Info
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { requestPlan, verifyRazorpayPayment, saveWeight, getAttendanceData } from '@/app/dashboard/actions';
