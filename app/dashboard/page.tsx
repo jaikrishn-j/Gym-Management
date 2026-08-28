@@ -79,7 +79,7 @@ export default async function DashboardPage() {
         initialPlans={allPlans.map(p => ({
           id: p.id,
           name: p.name,
-          description: p.descripttion,
+          description: p.description,
           price: p.price,
           offerPrice: p.offerPrice,
           billingDays: p.billingDays,
@@ -117,7 +117,7 @@ export default async function DashboardPage() {
           plan: {
             id: previousPlan.plan.id,
             name: previousPlan.plan.name,
-            description: previousPlan.plan.descripttion,
+            description: previousPlan.plan.description,
             price: previousPlan.plan.price,
             offerPrice: previousPlan.plan.offerPrice,
             billingDays: previousPlan.plan.billingDays,

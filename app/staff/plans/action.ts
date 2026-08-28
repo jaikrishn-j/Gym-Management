@@ -13,7 +13,7 @@ function toPlanDbInput(data: Record<string, unknown>): Record<string, unknown> {
   const clean: Record<string, unknown> = {}
   for (const [key, value] of Object.entries(data)) {
     if (key === 'description') {
-      clean.descripttion = value
+      clean.description = value
     } else if (ALLOWED_PLAN_FIELDS.has(key)) {
       clean[key] = value
     }
@@ -24,7 +24,7 @@ function toPlanDbInput(data: Record<string, unknown>): Record<string, unknown> {
 function mapDbToPlan(dbRecord: any): any {
   return {
     ...dbRecord,
-    description: dbRecord.descripttion ?? dbRecord.description,
+    description: dbRecord.description ?? dbRecord.description,
   };
 }
 

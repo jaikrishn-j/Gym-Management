@@ -3,7 +3,7 @@ import { boolean, integer, pgTable, real, text, timestamp, uniqueIndex, index, p
 export const plans = pgTable("plans", {
   id: text("id").primaryKey().$defaultFn(()=>crypto.randomUUID()),
   name: text("name").notNull(),
-  descripttion: text("description").notNull(),
+  description: text("description").notNull(),
   price: real("price").notNull(),
   offerPrice: real("offer_price"),
   billingDays: integer("billing_days").notNull(),

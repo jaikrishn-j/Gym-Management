@@ -24,7 +24,7 @@ interface Member {
 function mapDbToPlan(dbRecord: any): any {
   return {
     ...dbRecord,
-    description: dbRecord.descripttion ?? dbRecord.description,
+    description: dbRecord.description ?? dbRecord.description,
   };
 }
 
@@ -87,7 +87,7 @@ export async function readMemberPlans(clerkUserId: string) {
         plan: {
           id: plans.id,
           name: plans.name,
-          description: plans.descripttion,
+          description: plans.description,
           price: plans.price,
           offerPrice: plans.offerPrice,
           billingDays: plans.billingDays,
